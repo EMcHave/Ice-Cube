@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="App.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="GameClass.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="MyRenderer.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\BasicLoader.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\DDSTextureLoader.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\DeviceResources.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\PersistentState.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\BasicReaderWriter.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshObject.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometricObject.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="Cube.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeMesh.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="MoveLookController.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="LogicClass.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="GameClass.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="MyRenderer.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\BasicLoader.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\BasicMath.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\BasicShapes.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\DDSTextureLoader.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\DeviceResources.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\PersistentState.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\StepTimer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\BasicReaderWriter.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantBuffers.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshObject.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometricObject.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeMesh.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveLookController.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\DirectXSample.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="LogicClass.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\LockScreenLogo.scale-200.png" />
+    <Image Include="Assets\SplashScreen.scale-200.png" />
+    <Image Include="Assets\Square150x150Logo.scale-200.png" />
+    <Image Include="Assets\Square44x44Logo.scale-200.png" />
+    <Image Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+    <Image Include="Assets\StoreLogo.png" />
+    <Image Include="Assets\Wide310x150Logo.scale-200.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="PropertySheet.props" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>{92ffc006-73df-46d2-9436-3a5420ade79c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Content">
+      <UniqueIdentifier>{06063603-9859-40e1-8ca9-c623ad7527ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base">
+      <UniqueIdentifier>{e31c94e2-8aca-47a2-83c5-55bf12a08b3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{dff6bb8d-5bb1-4c33-92ec-657db8433fc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{c486f051-73be-4397-beb1-297e56a29d29}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Content\VertexShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
+    <FxCompile Include="Content\PixelShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>
