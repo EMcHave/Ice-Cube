@@ -1,12 +1,21 @@
 #pragma once
+
+enum Axis
+{
+    X,
+    Y,
+    Z
+};
+
 class MeshObject
 {
 public:
-    MeshObject();
+    MeshObject(_In_opt_ bool isLine);
 
     virtual void Render(_In_ ID3D11DeviceContext* context);
 
 protected:
+    bool                          m_isLine;
     int                           m_vertexCount;
     int                           m_indexCount;
     winrt::com_ptr<ID3D11Buffer>  m_vertexBuffer;

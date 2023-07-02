@@ -1,11 +1,9 @@
 #include "pch.h"
-#include "CubeMesh.h"
+#include "LineMesh.h"
 #include "ConstantBuffers.h"
 
-using namespace DirectX;
-using namespace winrt::Windows::Foundation::Numerics;
 
-CubeMesh::CubeMesh(_In_opt_ bool isLine, _In_ winrt::com_ptr<ID3D11Device3> const& device) : MeshObject(_In_opt_ isLine)
+LineMesh::LineMesh(bool isLine, Axis axis, winrt::com_ptr<ID3D11Device3> const& device) : MeshObject(isLine)
 {
     const D3D11_INPUT_ELEMENT_DESC PNTVertexLayout[] =
     {
@@ -13,38 +11,31 @@ CubeMesh::CubeMesh(_In_opt_ bool isLine, _In_ winrt::com_ptr<ID3D11Device3> cons
         { "COLOR",    0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
 
+    float3 color;
+    switch (axis)
+    {
+    case X:
+        color = float3(1.f, 0.f, 0.f);
+        break;
+    case Y:
+        color = float3(0.f, 1.f, 0.f);
+        break;
+    case Z:
+        color = float3(0.f, 0.f, 1.f);
+        break;
+    default:
+        break;
+    }
+
     PNTVertex cubeVertices[] =
     {
-        { float3(-0.5f, 0.5f, -0.5f), float3(0.0f, 1.0f, 0.0f) }, // +Y (top face)
-        { float3(0.5f, 0.5f, -0.5f), float3(1.0f, 1.0f, 0.0f) },
-        { float3(0.5f, 0.5f,  0.5f), float3(1.0f, 1.0f, 1.0f) },
-        { float3(-0.5f, 0.5f,  0.5f), float3(0.0f, 1.0f, 1.0f) },
-
-        { float3(-0.5f, -0.5f,  0.5f), float3(0.0f, 0.0f, 1.0f) }, // -Y (bottom face)
-        { float3(0.5f, -0.5f,  0.5f), float3(1.0f, 0.0f, 1.0f) },
-        { float3(0.5f, -0.5f, -0.5f), float3(1.0f, 0.0f, 0.0f) },
-        { float3(-0.5f, -0.5f, -0.5f), float3(0.0f, 0.0f, 0.0f) },
+        { float3(-0.5f, 0.f, 0.f), color }, // +Y (top face)
+        { float3(0.5f, 0.f, 0.f), color },
     };
 
     unsigned short cubeIndices[] =
     {
-        0, 1, 2,
-        0, 2, 3,
-
-        4, 5, 6,
-        4, 6, 7,
-
-        3, 2, 5,
-        3, 5, 4,
-
-        2, 1, 6,
-        2, 6, 5,
-
-        1, 7, 6,
-        1, 0, 7,
-
-        0, 3, 4,
-        0, 4, 7
+        0, 1
     };
 
     m_vertexCount = ARRAYSIZE(cubeVertices);

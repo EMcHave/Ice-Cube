@@ -8,6 +8,7 @@
 #include "Common/BasicLoader.h"
 #include "ConstantBuffers.h"
 #include "LogicClass.h"
+#include "Line.h"
 
 
 using namespace winrt::Windows::Foundation::Numerics;
@@ -31,6 +32,7 @@ private:
     // Cached pointer to device resources.
     std::shared_ptr<DX::DeviceResources>            m_deviceResources;
     std::vector<std::shared_ptr<Cube>>              m_objects;
+    std::vector<std::shared_ptr<Line>>              m_lines;
     std::shared_ptr <LogicClass>                    m_game;
 
     // Constant Buffers

@@ -6,11 +6,13 @@ class Cube : public GeometricObject
 {
 public:
 	Cube();
-	Cube(DirectX::XMFLOAT3 pos);
+	Cube(DirectX::XMFLOAT3 pos, std::array<DirectX::XMVECTOR, 3> m_rigidVectors, bool);
 
 	using GeometricObject::Position;
 	void Position(DirectX::XMFLOAT3 position);
 	void Position(DirectX::XMVECTOR position);
+
+
 
 private:
 	void Update();

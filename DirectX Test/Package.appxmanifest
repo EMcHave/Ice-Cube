@@ -3,7 +3,7 @@
   <Identity
     Name="57706981-f180-45fb-b86d-540487fb0bc4"
     Publisher="CN=mchav"
-    Version="1.0.0.0" />
+    Version="1.0.3.0" />
   <mp:PhoneIdentity PhoneProductId="57706981-f180-45fb-b86d-540487fb0bc4" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
   <Properties>
     <DisplayName>DirectX Test</DisplayName>

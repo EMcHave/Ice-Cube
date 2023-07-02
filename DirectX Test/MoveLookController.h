@@ -1,5 +1,5 @@
 #pragma once
-#define ROTATION_GAIN 0.008f    // Sensitivity adjustment for the look controller
+#define ROTATION_GAIN 0.004f    // Sensitivity adjustment for the look controller
 #define MOVEMENT_GAIN 0.1f
 
 class MoveLookController

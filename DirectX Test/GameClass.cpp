@@ -42,11 +42,11 @@ void GameClass::Update()
 		m_controller->Orientation(),
 		DirectX::XMFLOAT3(0, 1, 0)
 	);
-	m_logic->a = 100;
 
 	delta += 0.005;
-	for (int i = 0; i < 30; i++)
-		m_logic->Object(i)->Position(DirectX::XMFLOAT3(sinf((i + 1) * delta), cosf((i + 1) * delta), -sinf((i + 1) * delta)));
+	m_logic->TimeStep();
+	//for (int i = 0; i < m_logic->RenderObjects().size(); i++)
+		//m_logic->Object(i)->Position(DirectX::XMFLOAT3(sinf((i + 1) * delta), cosf((i + 1) * delta), -sinf((i + 1) * delta)));
 	
 	
 }

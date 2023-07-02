@@ -2,6 +2,7 @@
 #include "MyRenderer.h"
 #include "Cube.h"
 #include "CubeMesh.h"
+#include "LineMesh.h"
 
 
 using namespace DirectX;
@@ -16,6 +17,11 @@ MyRenderer::MyRenderer(std::shared_ptr<DX::DeviceResources> const& deviceResourc
 void MyRenderer::CreateDeviceDependentResources(_In_ std::shared_ptr<LogicClass> logic)
 {
     m_objects = logic->RenderObjects();
+
+    m_lines = std::vector<std::shared_ptr<Line>>();
+    m_lines.push_back(std::make_shared<Line>(Axis::X));
+    m_lines.push_back(std::make_shared<Line>(Axis::Y));
+    m_lines.push_back(std::make_shared<Line>(Axis::Z));
 
     m_game = logic;
 
@@ -59,14 +65,17 @@ void MyRenderer::CreateDeviceDependentResources(_In_ std::shared_ptr<LogicClass>
     loader.LoadShader(L"VertexShader.cso", PNTVertexLayout, numElements, m_vertexShader.put(), m_inputLayout.put());
     loader.LoadShader(L"PixelShader.cso", m_pixelShader.put());
 
-    auto cubeMesh = std::make_shared<CubeMesh>(d3dDevice);
+    auto cubeMesh = std::make_shared<CubeMesh>(false, d3dDevice);
+
 
 
     
     for (auto&& object : m_objects)
-    {
         object->Mesh(cubeMesh);
-    }
+
+    m_lines.at(0)->Mesh(std::make_shared<LineMesh>(true, Axis::X, d3dDevice));
+    m_lines.at(1)->Mesh(std::make_shared<LineMesh>(true, Axis::Y, d3dDevice));
+    m_lines.at(2)->Mesh(std::make_shared<LineMesh>(true, Axis::Z, d3dDevice));
     
 }
 
@@ -201,8 +210,7 @@ void MyRenderer::Render()
     );
     
     for (auto&& object : m_objects)
-    {
         object->Render(m_d3dDeviceContext, m_constantBufferChangesEveryPrim.get());
-    }
-    
+    for (auto&& object : m_lines)
+        object->Render(m_d3dDeviceContext, m_constantBufferChangesEveryPrim.get());
 }

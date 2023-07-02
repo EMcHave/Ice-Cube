@@ -43,6 +43,12 @@
       <Filter>Base</Filter>
     </ClCompile>
     <ClCompile Include="LogicClass.cpp" />
+    <ClCompile Include="LineMesh.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="Line.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -102,6 +108,15 @@
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="LogicClass.h" />
+    <ClInclude Include="DirectXMath.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="LineMesh.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Line.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\LockScreenLogo.scale-200.png" />
@@ -118,6 +133,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="PropertySheet.props" />
+    <None Include="DirectX Test_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
