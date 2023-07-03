@@ -22,6 +22,10 @@ void MyRenderer::CreateDeviceDependentResources(_In_ std::shared_ptr<LogicClass>
     m_lines.push_back(std::make_shared<Line>(Axis::X));
     m_lines.push_back(std::make_shared<Line>(Axis::Y));
     m_lines.push_back(std::make_shared<Line>(Axis::Z));
+    for (auto&& obj : m_objects)
+        for (int i = 0; i < 3; i++)
+            m_lines.push_back(obj->OrientationVector(i));
+
 
     m_game = logic;
 
@@ -76,6 +80,8 @@ void MyRenderer::CreateDeviceDependentResources(_In_ std::shared_ptr<LogicClass>
     m_lines.at(0)->Mesh(std::make_shared<LineMesh>(true, Axis::X, d3dDevice));
     m_lines.at(1)->Mesh(std::make_shared<LineMesh>(true, Axis::Y, d3dDevice));
     m_lines.at(2)->Mesh(std::make_shared<LineMesh>(true, Axis::Z, d3dDevice));
+    for (int i = 3; i < m_lines.size(); i++)
+        m_lines.at(i)->Mesh(std::make_shared<LineMesh>(true, Axis::W, d3dDevice));
     
 }
 
@@ -213,4 +219,6 @@ void MyRenderer::Render()
         object->Render(m_d3dDeviceContext, m_constantBufferChangesEveryPrim.get());
     for (auto&& object : m_lines)
         object->Render(m_d3dDeviceContext, m_constantBufferChangesEveryPrim.get());
+    //for (int i = 3; i < m_lines.size(); i++)
+        //m_lines[i]->Render(m_d3dDeviceContext, m_constantBufferChangesEveryPrim.get());
 }

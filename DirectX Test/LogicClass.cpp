@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "LogicClass.h"
+
 using namespace DirectX;
 LogicClass::LogicClass()
 {
@@ -27,20 +28,22 @@ void LogicClass::Init(std::shared_ptr<MoveLookController> const& controller, std
 	XMFLOAT3 n2(0, 1, 0);
 	XMFLOAT3 n3(0, 0, 1);
 
-	std::array<XMVECTOR, 3> vectors1 
+	std::array<std::shared_ptr<Line>, 3> vectors1 
 	{
-		XMLoadFloat3(&n1),
-		XMLoadFloat3(&n2),
-		XMLoadFloat3(&n3)
+		std::make_shared<Line>(Axis::W, XMFLOAT3(0, 0, 0), XMLoadFloat3(&n1)),
+		std::make_shared<Line>(Axis::W, XMFLOAT3(0, 0, 0), -XMLoadFloat3(&n2)),
+		std::make_shared<Line>(Axis::W, XMFLOAT3(0, 0, 0), XMLoadFloat3(&n3))
 	};
-	std::array<XMVECTOR, 3> vectors2 
+	std::array<std::shared_ptr<Line>, 3> vectors2
 	{
-		-XMLoadFloat3(&n1),
-		XMLoadFloat3(&n2),
-		XMLoadFloat3(&n3)
+		std::make_shared<Line>(Axis::W, XMFLOAT3(0, 0, 0), -XMLoadFloat3(&n1)),
+		std::make_shared<Line>(Axis::W, XMFLOAT3(0, 0, 0), -XMLoadFloat3(&n2)),
+		std::make_shared<Line>(Axis::W, XMFLOAT3(0, 0, 0), XMLoadFloat3(&n3))
 	};
+
+
 	auto cube1 = std::make_shared<Cube>(XMFLOAT3(0, 0, 0), vectors1, true);
-	auto cube2 = std::make_shared<Cube>(XMFLOAT3(2.5, 1, 0), vectors2, false);
+	auto cube2 = std::make_shared<Cube>(XMFLOAT3(2.5, 0.2, 0), vectors2, false);
 	m_objects.push_back(cube1);
 	m_objects.push_back(cube2);
 

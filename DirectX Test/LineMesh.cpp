@@ -23,6 +23,9 @@ LineMesh::LineMesh(bool isLine, Axis axis, winrt::com_ptr<ID3D11Device3> const& 
     case Z:
         color = float3(0.f, 0.f, 1.f);
         break;
+    case W:
+        color = float3(1.f, 1.f, 1.f);
+        break;
     default:
         break;
     }

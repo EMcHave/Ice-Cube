@@ -175,8 +175,8 @@ void MoveLookController::InitWindow(winrt::Windows::UI::Core::CoreWindow const& 
     //  Need to init this as it is reset every frame.
     m_moveCommand = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 
-    m_position = DirectX::XMFLOAT3(-2, 2, -6);
-    Orientation(0, 0);
+    m_position = DirectX::XMFLOAT3(3.0f, 2.0f, 3.6f);
+    Orientation(-0.4, -2.7);
 }
 
 void MoveLookController::Orientation(float pitch, float yaw)

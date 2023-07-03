@@ -2,6 +2,7 @@
 #include <array>
 #include "MeshObject.h"
 #include "ConstantBuffers.h"
+
 //#include "DirectXMath.h"
 
 class GeometricObject
@@ -26,15 +27,13 @@ public:
 	void Quaternion(DirectX::XMVECTOR quaternion);
 	DirectX::XMMATRIX ModelMatrix();
 	DirectX::XMFLOAT3 Position();
-	DirectX::XMVECTOR VectorPosition();
-	DirectX::XMVECTOR VectorVelocity();
 	DirectX::XMFLOAT3 Velocity();
-	DirectX::XMVECTOR VectorAngularVelocity();
 	DirectX::XMFLOAT3 AngularVelocity();
 	DirectX::XMFLOAT4 Quaternion();
+	DirectX::XMVECTOR VectorPosition();
+	DirectX::XMVECTOR VectorVelocity();
+	DirectX::XMVECTOR VectorAngularVelocity();
 	DirectX::XMVECTOR VectorQuaternion();
-
-	DirectX::XMVECTOR n_i(int i) { return m_rigidVectors[i-1]; }
 
 	bool									m_isFixed;
 	static float DistanceIJ(
@@ -47,7 +46,6 @@ protected:
 	DirectX::XMFLOAT3						m_velocity;
 	DirectX::XMFLOAT3						m_angularVelocity;
 	DirectX::XMFLOAT4						m_quaternion;
-	std::array<DirectX::XMVECTOR, 3>		m_rigidVectors;
 	float									m_xAngle;
 	float									m_yAngle;
 	float									m_zAngle;
@@ -154,6 +152,7 @@ inline float GeometricObject::DistanceIJ(std::shared_ptr<GeometricObject> const&
 	XMStoreFloat(&distance, length);
 	return distance;
 }
+
 
 __forceinline DirectX::XMVECTOR GeometricObject::VectorVelocity()
 {

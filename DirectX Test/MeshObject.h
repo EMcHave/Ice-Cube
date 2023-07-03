@@ -4,7 +4,8 @@ enum Axis
 {
     X,
     Y,
-    Z
+    Z, 
+    W
 };
 
 class MeshObject

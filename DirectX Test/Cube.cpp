@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Cube.h"
+#include "Line.h"
 #include "DirectXMath.h"
 
 using namespace DirectX;
@@ -11,7 +12,7 @@ Cube::Cube()
     Update();
 }
 
-Cube::Cube(XMFLOAT3 position, std::array<XMVECTOR, 3> rigidVectors, bool isFixed)
+Cube::Cube(XMFLOAT3 position, std::array<std::shared_ptr<Line>, 3> rigidVectors, bool isFixed)
 {
     m_isFixed = isFixed;
     m_position = position;
@@ -29,5 +30,9 @@ void Cube::Update()
     );
 
     for (auto& vec : m_rigidVectors)
-        vec = XMVector3Rotate(vec, VectorQuaternion());
+    {
+        vec->Quaternion(VectorQuaternion());
+        vec->Orientation(XMVector3Rotate(vec->VectorOrientation(), VectorQuaternion()));
+    }
+        
 }

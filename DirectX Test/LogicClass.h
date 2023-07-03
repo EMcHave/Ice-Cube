@@ -1,6 +1,7 @@
 #pragma once
 #include "Camera.h"
 #include "Cube.h"
+#include "Line.h"
 #include "MoveLookController.h"
 
 class MyRenderer;
