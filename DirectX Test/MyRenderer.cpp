@@ -22,9 +22,12 @@ void MyRenderer::CreateDeviceDependentResources(_In_ std::shared_ptr<LogicClass>
     m_lines.push_back(std::make_shared<Line>(Axis::X));
     m_lines.push_back(std::make_shared<Line>(Axis::Y));
     m_lines.push_back(std::make_shared<Line>(Axis::Z));
-    for (auto&& obj : m_objects)
+    for(auto&& connection : logic->RenderVectors())
         for (int i = 0; i < 3; i++)
-            m_lines.push_back(obj->OrientationVector(i));
+        {
+            m_lines.push_back(connection->v1_i(i));
+            m_lines.push_back(connection->v2_i(i));
+        }
 
 
     m_game = logic;

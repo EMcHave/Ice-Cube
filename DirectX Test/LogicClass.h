@@ -18,6 +18,7 @@ public:
 	);
 	Camera& GameCamera() { return m_camera; };
 	std::vector<std::shared_ptr<Cube>> const& RenderObjects() { return m_objects; };
+	std::vector<std::shared_ptr<Connection>> const& RenderVectors() { return m_connections; };
 	std::shared_ptr<Cube>& Object(int i) { return m_objects.at(i); };
 
 	void TimeStep();

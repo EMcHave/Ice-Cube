@@ -12,3 +12,17 @@ Connection::Connection(
 	m_vectors2(v2)
 {
 }
+
+void Connection::Update()
+{
+	for (std::shared_ptr<Line> vec : m_vectors1)
+	{
+		vec->Quaternion(p1()->VectorQuaternion());
+		vec->Position(p1()->VectorPosition());
+	}
+	for (std::shared_ptr<Line> vec : m_vectors2)
+	{
+		vec->Quaternion(p2()->VectorQuaternion());
+		vec->Position(p2()->VectorPosition());
+	}
+}
