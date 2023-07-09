@@ -8,13 +8,6 @@ using namespace DirectX;
 
 Camera::Camera()
 {
-    // Setup the view matrix.
-    SetViewParams(
-        XMFLOAT3(-2.0f, 2.0f, -6.0f),   // Default eye position.
-        XMFLOAT3(0.0f, 0.0f, 0.0f),   // Default look at position.
-        XMFLOAT3(0.0f, 1.0f, 0.0f)    // Default up vector.
-    );
-
     // Setup the projection matrix.
     SetProjParams(XM_PI / 4, 1.0f, 1.0f, 1000.0f);
 }

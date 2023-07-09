@@ -60,8 +60,12 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
         {
             m_window.get().Dispatcher().ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
             m_main->Update();
-            if (m_main->Render())
-                m_deviceResources->Present();
+            if (m_main->delta % 1 == 0)
+            {
+                if (m_main->Render())
+                    m_deviceResources->Present();
+            }
+            
             
         }
     }

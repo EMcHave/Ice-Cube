@@ -42,6 +42,7 @@ public:
 
 protected:
 	DirectX::XMFLOAT4X4						m_modelMatrix;
+	DirectX::XMMATRIX						m_initialMatrix;
 	DirectX::XMFLOAT3						m_position;
 	DirectX::XMFLOAT3						m_velocity;
 	DirectX::XMFLOAT3						m_angularVelocity;

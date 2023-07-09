@@ -7,11 +7,24 @@ Line::Line(Axis axis) : m_axis(axis)
 	Init();
 }
 
-Line::Line(Axis axis, DirectX::XMFLOAT3 pos, DirectX::XMVECTOR orientation)
+Line::Line(Axis axis, DirectX::XMFLOAT3 pos, DirectX::XMVECTOR direction)
 {
 	m_position = pos;
 	m_axis = axis;
-	XMStoreFloat3(&m_vector, orientation);
+	m_initialMatrix = XMMatrixIdentity();
+	XMStoreFloat3(&m_vector, direction);
+	XMStoreFloat3(&m_initVector, direction);
+	Init();
+}
+
+Line::Line(Axis axis, DirectX::XMFLOAT3 pos, DirectX::XMVECTOR direction, DirectX::XMVECTOR initQuat)
+{
+	m_position = pos;
+	m_axis = axis;
+	m_initialMatrix = XMMatrixIdentity();
+	XMStoreFloat4(&m_quaternion, initQuat);
+	XMStoreFloat3(&m_vector, direction);
+	XMStoreFloat3(&m_initVector, direction);
 	Init();
 }
 
@@ -20,11 +33,10 @@ void Line::Update()
 	if(m_axis == Axis::W)
 		XMStoreFloat4x4(
 			&m_modelMatrix,
-			m_initialMatrix *
-			XMMatrixTranslation(m_position.x, m_position.y, m_position.z) *
-			XMMatrixRotationQuaternion(VectorQuaternion())
+			m_initialMatrix * XMMatrixRotationQuaternion(VectorQuaternion()) *
+			XMMatrixTranslation(m_position.x, m_position.y, m_position.z)
 		);
-		
+	
 }
 
 void Line::Init()
@@ -45,13 +57,13 @@ void Line::Init()
 	case Y:
 		XMStoreFloat4x4(
 			&m_modelMatrix,
-			DirectX::XMMatrixTranslation(0.5, 0, 0) * DirectX::XMMatrixRotationY(3.1415 / 2)
+			DirectX::XMMatrixRotationZ(3.1415 / 2) * DirectX::XMMatrixTranslation(0, 0.5, 0)
 		);
 		break;
 	case Z:
 		XMStoreFloat4x4(
 			&m_modelMatrix,
-			DirectX::XMMatrixTranslation(0.5, 0, 0) * DirectX::XMMatrixRotationZ(3.1415 / 2)
+			DirectX::XMMatrixRotationY(3.1415 / 2) * DirectX::XMMatrixTranslation(0, 0, 0.5)
 		);
 	case W:
 	{
@@ -66,14 +78,11 @@ void Line::Init()
 		float ang = atan2f(crossLen, dot);
 		XMVectorEqualR(&equal, rot, vec2);
 		if (equal != 128)
-			m_initialMatrix =
-			DirectX::XMMatrixTranslation(0, 0, 0) *
+			m_initialMatrix *= 
 			DirectX::XMMatrixRotationAxis(rot, ang);
 		else
-			m_initialMatrix =
-			DirectX::XMMatrixTranslation(0, 0, 0) *
+			m_initialMatrix *= 
 			DirectX::XMMatrixRotationZ(ang);
-
 		break;
 	}
 	default:

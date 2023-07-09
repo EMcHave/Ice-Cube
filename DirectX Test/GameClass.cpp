@@ -16,7 +16,7 @@ GameClass::GameClass(std::shared_ptr<DX::DeviceResources> const& deviceResources
 GameClass::~GameClass()
 {
 	m_deviceResources->RegisterDeviceNotify(nullptr);
-	}
+}
 
 void GameClass::CreateWindowSizeDependentResources()
 {
@@ -35,6 +35,7 @@ void GameClass::AddObject(std::shared_ptr<Cube> cube)
 
 void GameClass::Update()
 {
+	delta += 1;
 	auto pos = m_controller->Position();
 	m_controller->Update();
 	m_logic->GameCamera().SetViewParams(
@@ -43,12 +44,9 @@ void GameClass::Update()
 		DirectX::XMFLOAT3(0, 1, 0)
 	);
 
-	delta += 0.005;
 	m_logic->TimeStep();
 	//for (int i = 0; i < m_logic->RenderObjects().size(); i++)
 		//m_logic->Object(i)->Position(DirectX::XMFLOAT3(sinf((i + 1) * delta), cosf((i + 1) * delta), -sinf((i + 1) * delta)));
-	
-	
 }
 
 bool GameClass::Render()

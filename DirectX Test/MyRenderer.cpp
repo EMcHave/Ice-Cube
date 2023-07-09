@@ -98,7 +98,7 @@ void MyRenderer::CreateWindowSizeDependentResources()
         fovAngleY *= 2.0f;
     }
 
-    XMMATRIX perspectiveMatrix = XMMatrixPerspectiveFovRH(
+    XMMATRIX perspectiveMatrix = XMMatrixPerspectiveFovLH(
         fovAngleY,
         aspectRatio,
         0.5f,
@@ -127,7 +127,7 @@ void MyRenderer::CreateWindowSizeDependentResources()
     static const XMVECTORF32 at = { 0.0f, 0.0f, 0.0f, 0.0f };
     static const XMVECTORF32 up = { 0.0f, 1.0f, 0.0f, 0.0f };
 
-    view = XMMatrixTranspose(XMMatrixLookAtRH(eye, at, up));
+    view = XMMatrixTranspose(XMMatrixLookAtLH(eye, at, up));
 
     d3dContext->UpdateSubresource(
         m_constantBufferChangeOnResize.get(),

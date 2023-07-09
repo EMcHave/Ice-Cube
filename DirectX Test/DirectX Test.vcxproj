@@ -126,6 +126,7 @@
     <ClInclude Include="Common\DirectXSample.h" />
     <ClInclude Include="Common\PersistentState.h" />
     <ClInclude Include="Common\StepTimer.h" />
+    <ClInclude Include="Connection.h" />
     <ClInclude Include="ConstantBuffers.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="CubeMesh.h" />
@@ -163,6 +164,7 @@
     <ClCompile Include="Common\DDSTextureLoader.cpp" />
     <ClCompile Include="Common\DeviceResources.cpp" />
     <ClCompile Include="Common\PersistentState.cpp" />
+    <ClCompile Include="Connection.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="CubeMesh.cpp" />
     <ClCompile Include="GameClass.cpp" />

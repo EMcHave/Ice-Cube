@@ -21,13 +21,15 @@ public:
 	void Update();
 	bool Render();
 
+	int delta;
+
 	// IDeviceNotify
 	virtual void OnDeviceLost();
 	virtual void OnDeviceRestored();
 
 private:
 
-	float delta;
+
 
 	std::shared_ptr <LogicClass>						m_logic;
 

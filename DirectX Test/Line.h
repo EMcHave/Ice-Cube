@@ -1,11 +1,13 @@
 #pragma once
 #include "GeometricObject.h"
+#include "DirectXMath.h"
 
 class Line : public GeometricObject
 {
 public:
 	Line(Axis axis);
-	Line(Axis axis, DirectX::XMFLOAT3 pos, DirectX::XMVECTOR orientation);
+	Line(Axis axis, DirectX::XMFLOAT3 pos, DirectX::XMVECTOR direction);
+	Line(Axis axis, DirectX::XMFLOAT3 pos, DirectX::XMVECTOR direction, DirectX::XMVECTOR initQuat);
 
 
 	DirectX::XMFLOAT3 Orientation() { return m_vector; }
@@ -17,11 +19,14 @@ public:
 	void Position(DirectX::XMFLOAT3 position);
 	void Position(DirectX::XMVECTOR position);
 
+	void Quaternion(DirectX::XMFLOAT4 position);
+	void Quaternion(DirectX::XMVECTOR position);
+
 private:
 	void Update();
 	void Init();
 	DirectX::XMFLOAT3 m_vector;
-	DirectX::XMMATRIX	m_initialMatrix;
+	DirectX::XMFLOAT3 m_initVector;
 	Axis m_axis;
 };
 
@@ -37,3 +42,18 @@ __forceinline void Line::Position(DirectX::XMVECTOR position)
 	Update();
 }
 
+__forceinline void Line::Quaternion(DirectX::XMFLOAT4 quaternion)
+{
+	m_quaternion = quaternion;
+	XMStoreFloat3(&m_vector, DirectX::XMVector3Rotate(XMLoadFloat3(&m_vector), XMLoadFloat4(&m_quaternion)));
+	Update();
+	
+}
+
+__forceinline void Line::Quaternion(DirectX::XMVECTOR quaternion)
+{
+	using namespace DirectX;
+	DirectX::XMStoreFloat4(&m_quaternion, quaternion);
+	XMStoreFloat3(&m_vector,XMVector3Rotate(XMLoadFloat3(&m_initVector), quaternion));
+	Update();
+}
