@@ -131,6 +131,7 @@
     <ClInclude Include="Cube.h" />
     <ClInclude Include="CubeMesh.h" />
     <ClInclude Include="DirectXMath.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="GameClass.h" />
     <ClInclude Include="GeometricObject.h" />
     <ClInclude Include="Line.h" />
@@ -167,6 +168,7 @@
     <ClCompile Include="Connection.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="CubeMesh.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="GameClass.cpp" />
     <ClCompile Include="GeometricObject.cpp" />
     <ClCompile Include="Line.cpp" />

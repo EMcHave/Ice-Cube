@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "Cube.h"
 #include "Line.h"
+#include "Entity.h"
 #include "MoveLookController.h"
 #include "Connection.h"
 
@@ -17,12 +18,19 @@ public:
 		_In_ std::shared_ptr<MyRenderer> const& renderer
 	);
 	Camera& GameCamera() { return m_camera; };
-	std::vector<std::shared_ptr<Cube>> const& RenderObjects() { return m_objects; };
+	std::vector<std::shared_ptr<Cube>> const& RenderObjects() { return m_particles; };
 	std::vector<std::shared_ptr<Connection>> const& RenderVectors() { return m_connections; };
-	std::shared_ptr<Cube>& Object(int i) { return m_objects.at(i); };
+	std::shared_ptr<Cube>& Object(int i) { return m_particles.at(i); };
 
 	void TimeStep();
-	DirectX::XMFLOAT4X4 A_Matrix(DirectX::XMFLOAT4 quaternion);
+
+	float LennardJones(float r)
+	{
+		float D = 0.005;
+		float A = a;
+
+		return 12 * D / a * (pow(A / r, 7) - pow(A / r, 13));
+	}
 
 	float B1() 
 	{ 
@@ -51,10 +59,12 @@ private:
 	std::shared_ptr<MoveLookController>				m_controller;
 	std::shared_ptr<MyRenderer>						m_renderer;
 	Camera											m_camera;
-	std::vector<std::shared_ptr<Cube>>				m_objects;
+	std::vector<std::shared_ptr<Cube>>				m_particles;
+	std::vector<std::shared_ptr<Entity>>			m_entities;
 	std::vector<std::shared_ptr<Connection>>		m_connections;
 
 	float dt;
+	float vis;
 
 	float m;
 	float E;

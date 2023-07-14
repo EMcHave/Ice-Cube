@@ -16,23 +16,18 @@ public:
 	void Quaternion(DirectX::XMVECTOR quaternion);
 	DirectX::XMFLOAT4 Quaternion();
 
-	void Force(DirectX::XMVECTOR f) 
-	{ 
-		m_force += f;
-	}
-	DirectX::XMVECTOR Force() { return m_force; }
+	void Force(DirectX::XMVECTOR f) { m_force = f; }
+	DirectX::XMVECTOR& Force() { return m_force; }
 
-	void Moment(DirectX::XMVECTOR m) 
-	{ 
-		m_moment += m;
-	}
+	void Moment(DirectX::XMVECTOR m) { m_moment = m; }
+	DirectX::XMVECTOR& Moment() { return m_moment; }
 
 	void ResetForcesAndMoments()
 	{
 		m_force = XMVectorZero();
 		m_moment = XMVectorZero();
 	}
-	DirectX::XMVECTOR Moment() { return m_moment; }
+	
 private:
 	void Update();
 	

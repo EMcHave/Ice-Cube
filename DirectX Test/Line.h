@@ -11,7 +11,7 @@ public:
 
 
 	DirectX::XMFLOAT3 Orientation() { return m_vector; }
-	DirectX::XMVECTOR VectorOrientation() { return DirectX::XMLoadFloat3(&m_vector); }
+	DirectX::XMVECTOR& VectorOrientation() { return DirectX::XMLoadFloat3(&m_vector); }
 	void Orientation(DirectX::XMFLOAT3 orient) { m_vector = orient; }
 	void Orientation(DirectX::XMVECTOR orient) { XMStoreFloat3(&m_vector, orient); }
 
