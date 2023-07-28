@@ -1,168 +1,186 @@
 ﻿#pragma once
 
-#include <wrl.h>
+#include <cmath>
+#include <cstdint>
+#include <exception>
+
 
 namespace DX
 {
-	// Helper class for animation and simulation timing.
-	class StepTimer
-	{
-	public:
-		StepTimer() : 
-			m_elapsedTicks(0),
-			m_totalTicks(0),
-			m_leftOverTicks(0),
-			m_frameCount(0),
-			m_framesPerSecond(0),
-			m_framesThisSecond(0),
-			m_qpcSecondCounter(0),
-			m_isFixedTimeStep(false),
-			m_targetElapsedTicks(TicksPerSecond / 60)
-		{
-			// Initialize max delta to 1/10 of a second.
-			m_qpcMaxDelta = m_qpcFrequency.QuadPart / 10;
-		}
+    // Helper class for animation and simulation timing.
+    class StepTimer
+    {
+    public:
+        StepTimer() noexcept(false) :
+            m_elapsedTicks(0),
+            m_totalTicks(0),
+            m_leftOverTicks(0),
+            m_frameCount(0),
+            m_framesPerSecond(0),
+            m_framesThisSecond(0),
+            m_qpcSecondCounter(0),
+            m_isFixedTimeStep(false),
+            m_targetElapsedTicks(TicksPerSecond / 60)
+        {
+            if (!QueryPerformanceFrequency(&m_qpcFrequency))
+            {
+                throw std::exception();
+            }
 
-		// Get elapsed time since the previous Update call.
-		INT64 GetElapsedTicks() const						{ return m_elapsedTicks; }
-		double GetElapsedSeconds() const					{ return TicksToSeconds(m_elapsedTicks); }
+            if (!QueryPerformanceCounter(&m_qpcLastTime))
+            {
+                throw std::exception();
+            }
 
-		// Get total time since the start of the program.
-		INT64 GetTotalTicks() const						{ return m_totalTicks; }
-		double GetTotalSeconds() const						{ return TicksToSeconds(m_totalTicks); }
+            // Initialize max delta to 1/10 of a second.
+            m_qpcMaxDelta = static_cast<uint64_t>(m_qpcFrequency.QuadPart / 10);
+        }
 
-		// Get total number of updates since start of the program.
-		INT32 GetFrameCount() const						{ return m_frameCount; }
+        // Get elapsed time since the previous Update call.
+        uint64_t GetElapsedTicks() const noexcept { return m_elapsedTicks; }
+        double GetElapsedSeconds() const noexcept { return TicksToSeconds(m_elapsedTicks); }
 
-		// Get the current framerate.
-		INT32 GetFramesPerSecond() const					{ return m_framesPerSecond; }
+        // Get total time since the start of the program.
+        uint64_t GetTotalTicks() const noexcept { return m_totalTicks; }
+        double GetTotalSeconds() const noexcept { return TicksToSeconds(m_totalTicks); }
 
-		// Set whether to use fixed or variable timestep mode.
-		void SetFixedTimeStep(bool isFixedTimestep)			{ m_isFixedTimeStep = isFixedTimestep; }
+        // Get total number of updates since start of the program.
+        uint32_t GetFrameCount() const noexcept { return m_frameCount; }
 
-		// Set how often to call Update when in fixed timestep mode.
-		void SetTargetElapsedTicks(INT64 targetElapsed)	{ m_targetElapsedTicks = targetElapsed; }
-		void SetTargetElapsedSeconds(double targetElapsed)	{ m_targetElapsedTicks = SecondsToTicks(targetElapsed); }
+        // Get the current framerate.
+        uint32_t GetFramesPerSecond() const noexcept { return m_framesPerSecond; }
 
-		// Integer format represents time using 10,000,000 ticks per second.
-		static const INT64 TicksPerSecond = 10000000;
+        // Set whether to use fixed or variable timestep mode.
+        void SetFixedTimeStep(bool isFixedTimestep) noexcept { m_isFixedTimeStep = isFixedTimestep; }
 
-		static double TicksToSeconds(INT64 ticks)			{ return static_cast<double>(ticks) / TicksPerSecond; }
-		static INT64 SecondsToTicks(double seconds)		{ return static_cast<INT64>(seconds * TicksPerSecond); }
+        // Set how often to call Update when in fixed timestep mode.
+        void SetTargetElapsedTicks(uint64_t targetElapsed) noexcept { m_targetElapsedTicks = targetElapsed; }
+        void SetTargetElapsedSeconds(double targetElapsed) noexcept { m_targetElapsedTicks = SecondsToTicks(targetElapsed); }
 
-		// After an intentional timing discontinuity (for instance a blocking IO operation)
-		// call this to avoid having the fixed timestep logic attempt a set of catch-up 
-		// Update calls.
+        // Integer format represents time using 10,000,000 ticks per second.
+        static constexpr uint64_t TicksPerSecond = 10000000;
 
-		void ResetElapsedTime()
-		{
-			m_leftOverTicks = 0;
-			m_framesPerSecond = 0;
-			m_framesThisSecond = 0;
-			m_qpcSecondCounter = 0;
-		}
+        static constexpr double TicksToSeconds(uint64_t ticks) noexcept { return static_cast<double>(ticks) / TicksPerSecond; }
+        static constexpr uint64_t SecondsToTicks(double seconds) noexcept { return static_cast<uint64_t>(seconds * TicksPerSecond); }
 
-		// Update timer state, calling the specified Update function the appropriate number of times.
-		template<typename TUpdate>
-		void Tick(const TUpdate& update)
-		{
-			// Query the current time.
-			LARGE_INTEGER currentTime;
+        // After an intentional timing discontinuity (for instance a blocking IO operation)
+        // call this to avoid having the fixed timestep logic attempt a set of catch-up
+        // Update calls.
 
-			if (!QueryPerformanceCounter(&currentTime))
-			{
-				throw ref new Platform::FailureException();
-			}
+        void ResetElapsedTime()
+        {
+            if (!QueryPerformanceCounter(&m_qpcLastTime))
+            {
+                throw std::exception();
+            }
 
-			INT64 timeDelta = currentTime.QuadPart - m_qpcLastTime.QuadPart;
+            m_leftOverTicks = 0;
+            m_framesPerSecond = 0;
+            m_framesThisSecond = 0;
+            m_qpcSecondCounter = 0;
+        }
 
-			m_qpcLastTime = currentTime;
-			m_qpcSecondCounter += timeDelta;
+        // Update timer state, calling the specified Update function the appropriate number of times.
+        template<typename TUpdate>
+        void Tick(const TUpdate& update)
+        {
+            // Query the current time.
+            LARGE_INTEGER currentTime;
 
-			// Clamp excessively large time deltas (e.g. after paused in the debugger).
-			if (timeDelta > m_qpcMaxDelta)
-			{
-				timeDelta = m_qpcMaxDelta;
-			}
+            if (!QueryPerformanceCounter(&currentTime))
+            {
+                throw std::exception();
+            }
 
-			// Convert QPC units into a canonical tick format. This cannot overflow due to the previous clamp.
-			timeDelta *= TicksPerSecond;
-			timeDelta /= m_qpcFrequency.QuadPart;
+            uint64_t timeDelta = static_cast<uint64_t>(currentTime.QuadPart - m_qpcLastTime.QuadPart);
 
-			INT32 lastFrameCount = m_frameCount;
+            m_qpcLastTime = currentTime;
+            m_qpcSecondCounter += timeDelta;
 
-			if (m_isFixedTimeStep)
-			{
-				// Fixed timestep update logic
+            // Clamp excessively large time deltas (e.g. after paused in the debugger).
+            if (timeDelta > m_qpcMaxDelta)
+            {
+                timeDelta = m_qpcMaxDelta;
+            }
 
-				// If the app is running very close to the target elapsed time (within 1/4 of a millisecond) just clamp
-				// the clock to exactly match the target value. This prevents tiny and irrelevant errors
-				// from accumulating over time. Without this clamping, a game that requested a 60 fps
-				// fixed update, running with vsync enabled on a 59.94 NTSC display, would eventually
-				// accumulate enough tiny errors that it would drop a frame. It is better to just round 
-				// small deviations down to zero to leave things running smoothly.
+            // Convert QPC units into a canonical tick format. This cannot overflow due to the previous clamp.
+            timeDelta *= TicksPerSecond;
+            timeDelta /= static_cast<uint64_t>(m_qpcFrequency.QuadPart);
 
-				if (abs(static_cast<int64>(timeDelta - m_targetElapsedTicks)) < TicksPerSecond / 4000)
-				{
-					timeDelta = m_targetElapsedTicks;
-				}
+            const uint32_t lastFrameCount = m_frameCount;
 
-				m_leftOverTicks += timeDelta;
+            if (m_isFixedTimeStep)
+            {
+                // Fixed timestep update logic
 
-				while (m_leftOverTicks >= m_targetElapsedTicks)
-				{
-					m_elapsedTicks = m_targetElapsedTicks;
-					m_totalTicks += m_targetElapsedTicks;
-					m_leftOverTicks -= m_targetElapsedTicks;
-					m_frameCount++;
+                // If the app is running very close to the target elapsed time (within 1/4 of a millisecond) just clamp
+                // the clock to exactly match the target value. This prevents tiny and irrelevant errors
+                // from accumulating over time. Without this clamping, a game that requested a 60 fps
+                // fixed update, running with vsync enabled on a 59.94 NTSC display, would eventually
+                // accumulate enough tiny errors that it would drop a frame. It is better to just round
+                // small deviations down to zero to leave things running smoothly.
 
-					update();
-				}
-			}
-			else
-			{
-				// Variable timestep update logic.
-				m_elapsedTicks = timeDelta;
-				m_totalTicks += timeDelta;
-				m_leftOverTicks = 0;
-				m_frameCount++;
+                if (static_cast<uint64_t>(std::abs(static_cast<int64_t>(timeDelta - m_targetElapsedTicks))) < TicksPerSecond / 4000)
+                {
+                    timeDelta = m_targetElapsedTicks;
+                }
 
-				update();
-			}
+                m_leftOverTicks += timeDelta;
 
-			// Track the current framerate.
-			if (m_frameCount != lastFrameCount)
-			{
-				m_framesThisSecond++;
-			}
+                while (m_leftOverTicks >= m_targetElapsedTicks)
+                {
+                    m_elapsedTicks = m_targetElapsedTicks;
+                    m_totalTicks += m_targetElapsedTicks;
+                    m_leftOverTicks -= m_targetElapsedTicks;
+                    m_frameCount++;
 
-			if (m_qpcSecondCounter >= static_cast<INT64>(m_qpcFrequency.QuadPart))
-			{
-				m_framesPerSecond = m_framesThisSecond;
-				m_framesThisSecond = 0;
-				m_qpcSecondCounter %= m_qpcFrequency.QuadPart;
-			}
-		}
+                    update();
+                }
+            }
+            else
+            {
+                // Variable timestep update logic.
+                m_elapsedTicks = timeDelta;
+                m_totalTicks += timeDelta;
+                m_leftOverTicks = 0;
+                m_frameCount++;
 
-	private:
-		// Source timing data uses QPC units.
-		LARGE_INTEGER m_qpcFrequency;
-		LARGE_INTEGER m_qpcLastTime;
-		INT64 m_qpcMaxDelta;
+                update();
+            }
 
-		// Derived timing data uses a canonical tick format.
-		INT64 m_elapsedTicks;
-		INT64 m_totalTicks;
-		INT64 m_leftOverTicks;
+            // Track the current framerate.
+            if (m_frameCount != lastFrameCount)
+            {
+                m_framesThisSecond++;
+            }
 
-		// Members for tracking the framerate.
-		INT32 m_frameCount;
-		INT32 m_framesPerSecond;
-		INT32 m_framesThisSecond;
-		INT64 m_qpcSecondCounter;
+            if (m_qpcSecondCounter >= static_cast<uint64_t>(m_qpcFrequency.QuadPart))
+            {
+                m_framesPerSecond = m_framesThisSecond;
+                m_framesThisSecond = 0;
+                m_qpcSecondCounter %= static_cast<uint64_t>(m_qpcFrequency.QuadPart);
+            }
+        }
 
-		// Members for configuring fixed timestep mode.
-		bool m_isFixedTimeStep;
-		INT64 m_targetElapsedTicks;
-	};
+    private:
+        // Source timing data uses QPC units.
+        LARGE_INTEGER m_qpcFrequency;
+        LARGE_INTEGER m_qpcLastTime;
+        uint64_t m_qpcMaxDelta;
+
+        // Derived timing data uses a canonical tick format.
+        uint64_t m_elapsedTicks;
+        uint64_t m_totalTicks;
+        uint64_t m_leftOverTicks;
+
+        // Members for tracking the framerate.
+        uint32_t m_frameCount;
+        uint32_t m_framesPerSecond;
+        uint32_t m_framesThisSecond;
+        uint64_t m_qpcSecondCounter;
+
+        // Members for configuring fixed timestep mode.
+        bool m_isFixedTimeStep;
+        uint64_t m_targetElapsedTicks;
+    };
 }

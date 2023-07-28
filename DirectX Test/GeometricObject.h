@@ -23,8 +23,11 @@ public:
 	void Velocity(DirectX::XMVECTOR velocity);
 	void AngularVelocity(DirectX::XMFLOAT3 a_velocity);
 	void AngularVelocity(DirectX::XMVECTOR a_velocity);
+	void AngularVelocityHalf(DirectX::XMVECTOR quaternion);
+	void KineticMoment(DirectX::XMVECTOR kineticMoment);
 	void Quaternion(DirectX::XMFLOAT4 quaternion);
 	void Quaternion(DirectX::XMVECTOR quaternion);
+	void QuaternionHalf(DirectX::XMVECTOR quaternion);
 	DirectX::XMMATRIX ModelMatrix();
 	DirectX::XMFLOAT3 Position();
 	DirectX::XMFLOAT3 Velocity();
@@ -33,7 +36,10 @@ public:
 	DirectX::XMVECTOR VectorPosition();
 	DirectX::XMVECTOR VectorVelocity();
 	DirectX::XMVECTOR VectorAngularVelocity();
+	DirectX::XMVECTOR VectorAngularVelocityHalf();
+	DirectX::XMVECTOR KineticMoment();
 	DirectX::XMVECTOR VectorQuaternion();
+	DirectX::XMVECTOR VectorQuaternionHalf();
 
 	bool									m_isFixed;
 	static float DistanceIJ(
@@ -46,7 +52,10 @@ protected:
 	DirectX::XMFLOAT3						m_position;
 	DirectX::XMFLOAT3						m_velocity;
 	DirectX::XMFLOAT3						m_angularVelocity;
+	DirectX::XMFLOAT3						m_angularVelocityHalf;
+	DirectX::XMFLOAT3						m_kineticMoment;
 	DirectX::XMFLOAT4						m_quaternion;
+	DirectX::XMFLOAT4						m_quaternionHalf;
 	float									m_xAngle;
 	float									m_yAngle;
 	float									m_zAngle;
@@ -109,6 +118,16 @@ inline void GeometricObject::AngularVelocity(DirectX::XMVECTOR a_velocity)
 	XMStoreFloat3(&m_angularVelocity, a_velocity);
 }
 
+inline void GeometricObject::AngularVelocityHalf(DirectX::XMVECTOR a_velocity)
+{
+	XMStoreFloat3(&m_angularVelocityHalf, a_velocity);
+}
+
+inline void GeometricObject::KineticMoment(DirectX::XMVECTOR kineticMoment)
+{
+	XMStoreFloat3(&m_kineticMoment, kineticMoment);
+}
+
 inline void GeometricObject::Quaternion(DirectX::XMFLOAT4 quaternion)
 {
 	m_quaternion = quaternion;
@@ -119,6 +138,11 @@ inline void GeometricObject::Quaternion(DirectX::XMVECTOR quaternion)
 	XMStoreFloat4(&m_quaternion, quaternion);
 }
 
+inline void GeometricObject::QuaternionHalf(DirectX::XMVECTOR quaternion)
+{
+	XMStoreFloat4(&m_quaternionHalf, quaternion);
+}
+
 __forceinline DirectX::XMFLOAT3 GeometricObject::Velocity()
 {
 	return m_velocity;
@@ -127,6 +151,16 @@ __forceinline DirectX::XMFLOAT3 GeometricObject::Velocity()
 inline DirectX::XMVECTOR GeometricObject::VectorAngularVelocity()
 {
 	return DirectX::XMLoadFloat3(&m_angularVelocity);
+}
+
+inline DirectX::XMVECTOR GeometricObject::VectorAngularVelocityHalf()
+{
+	return XMLoadFloat3(&m_angularVelocityHalf);
+}
+
+inline DirectX::XMVECTOR GeometricObject::KineticMoment()
+{
+	return XMLoadFloat3(&m_kineticMoment);
 }
 
 inline DirectX::XMFLOAT3 GeometricObject::AngularVelocity()
@@ -142,6 +176,11 @@ inline DirectX::XMFLOAT4 GeometricObject::Quaternion()
 inline DirectX::XMVECTOR GeometricObject::VectorQuaternion()
 {
 	return DirectX::XMLoadFloat4(&m_quaternion);
+}
+
+inline DirectX::XMVECTOR GeometricObject::VectorQuaternionHalf()
+{
+	return XMLoadFloat4(&m_quaternionHalf);
 }
 
 inline float GeometricObject::DistanceIJ(std::shared_ptr<GeometricObject> const& obj_i, std::shared_ptr<GeometricObject> const& obj_j)

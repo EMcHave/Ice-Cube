@@ -18,8 +18,6 @@ using namespace winrt::Windows::UI::Input;
 
 struct App : implements<App, IFrameworkViewSource, IFrameworkView>
 {
-    
-
     IFrameworkView CreateView()
     {
         return *this;
@@ -50,27 +48,53 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
         window.Activate();
     }
 
-    // This method is called after Load.
+
     void Run()
-    {
-        
+    {   
         m_main->CreateDeviceDependentResources();
         m_main->CreateWindowSizeDependentResources();
-        while (true)
+
+        m_main->Logic()->IsRealTime(1);
+        m_main->Logic()->DT(pow(10, -1));
+
+        if (m_main->Logic()->IsRealTime())
         {
-            m_window.get().Dispatcher().ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
-            m_main->Update();
-            if (m_main->delta % 10 == 0)
+            while (true)
             {
+                m_window.get().Dispatcher().ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
+                m_main->Update(0);
+
                 if (m_main->Render())
                     m_deviceResources->Present();
             }
+        }
+        else
+        {
+            float time = 2;
+            int N = time / m_main->Logic()->DT();
+
+            int dt = N / (time * 60);
+
+            //m_window.get().Dispatcher().ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
+            int begin = GetTickCount64();
+            for (int n = 0; n < N; n++)
+                m_main->Logic()->TimeStep();
+            elapsedTime = GetTickCount64() - begin;
             
-            
+            while (true)
+            {
+                for (int n = 0; n < N; n += dt)
+                {
+                    m_window.get().Dispatcher().ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
+                    m_main->Update(n);
+                    if (m_main->Render())
+                        m_deviceResources->Present();
+                }
+            }
         }
     }
 
-    // This method is called after Initialize.
+
     void SetWindow(CoreWindow const& window)
     {
         m_window = window;
@@ -143,13 +167,13 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
     void OnDpiChanged(DisplayInformation const& sender, IInspectable const& /* args */)
     {
         m_deviceResources->SetDpi(sender.LogicalDpi());
-        //m_main->CreateWindowSizeDependentResources();
+        m_main->CreateWindowSizeDependentResources();
     }
 
     void OnOrientationChanged(DisplayInformation const& sender, IInspectable const& /* args */)
     {
         m_deviceResources->SetCurrentOrientation(sender.CurrentOrientation());
-        //m_main->CreateWindowSizeDependentResources();
+        m_main->CreateWindowSizeDependentResources();
     }
 
     void OnDisplayContentsInvalidated(DisplayInformation const& /* sender */, IInspectable const& /* args */)
@@ -158,6 +182,7 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
     }
 
 private:
+    int elapsedTime;
     winrt::agile_ref<CoreWindow> m_window;
     std::shared_ptr<DX::DeviceResources> m_deviceResources;
     winrt::com_ptr<GameClass> m_main;

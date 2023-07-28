@@ -11,18 +11,41 @@ Connection::Connection(
 	m_vectors1(v1),
 	m_vectors2(v2)
 {
+	m_isBroken = false;
+	p1->RegisterConnection();
+	p2->RegisterConnection();
 }
 
 void Connection::Update()
 {
-	for (std::shared_ptr<Line> vec : m_vectors1)
+	if (!m_isBroken)
 	{
-		vec->Quaternion(p1()->VectorQuaternion());
-		vec->Position(p1()->VectorPosition());
+		for (std::shared_ptr<Line> vec : m_vectors1)
+		{
+			vec->Quaternion(p1()->VectorQuaternion());
+			vec->Position(p1()->VectorPosition());
+		}
+		for (std::shared_ptr<Line> vec : m_vectors2)
+		{
+			vec->Quaternion(p2()->VectorQuaternion());
+			vec->Position(p2()->VectorPosition());
+		}
 	}
-	for (std::shared_ptr<Line> vec : m_vectors2)
+}
+
+void Connection::Break(std::vector<std::shared_ptr<Cube>>& contactParticles)
+{
+	m_isBroken = true;
+	m_particle1->UnRegisterConnection();
+	m_particle2->UnRegisterConnection();
+	if (!m_particle1->IsContact())
 	{
-		vec->Quaternion(p2()->VectorQuaternion());
-		vec->Position(p2()->VectorPosition());
+		contactParticles.push_back(m_particle1);
+		m_particle1->MakeContact();
+	}
+	if (!m_particle2->IsContact())
+	{
+		contactParticles.push_back(m_particle2);
+		m_particle2->MakeContact();
 	}
 }

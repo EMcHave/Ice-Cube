@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "LogicClass.h"
 
+
 #define pidiv4 Directx::XM_PIDIV4;
 
 using namespace DirectX;
@@ -9,114 +10,215 @@ LogicClass::LogicClass()
 
 }
 
-void LogicClass::Init(std::shared_ptr<MoveLookController> const& controller, std::shared_ptr<MyRenderer> const& renderer)
+void LogicClass::Init(
+	std::shared_ptr<MoveLookController> const& controller,
+	std::shared_ptr<MyRenderer> const& renderer)
 {
 	m_controller = controller;
 	m_renderer = renderer;
 	m_camera.SetProjParams(70.0f * 3.1415 / 180.0f, 1.0f, 0.01f, 100.0f);
-	
+	m_gravity = XMFLOAT3(0, -0.1, 0);
 
-	E = 20;
-	G = 20;
+	E = 2 * pow(10, 4);
+	G = 2 * pow(10, 2);
 	nu = 0.3;
+	float rho = 900;
 	m = 1;
-	a = 1;
+	a = 0.5;
 	J = 1;
 	Jp = 5 * pow(10, -10);
 	S = 0.0025;
 	k = pow(10, 8);
-	dt = pow(10, -3);
 
-	int NX = 3;
-	int NY = 3;
-	int NZ = 3;
 
-	vis = 0;
 
-	//XMVECTOR axis = DirectX::XMQuaternionRotationAxis(XMLoadFloat3(&n3), 0);
+	int NX = 10;
+	int NY = 20;
+	int NZ = 1;
+
+	InitialConditions initCond1 { XMFLOAT3(0, 0, 8), XMFLOAT3(0.2, -0, 0) };
+	InitialConditions initCond2 { XMFLOAT3(7, 0, 0), XMFLOAT3(0, 0, 0) };
+	InitialConditions initCond3 { XMFLOAT3(6, 0, 6), XMFLOAT3(0, 0, -0.5) };
+	Material mat{ E, G, nu, rho };
 	
-	auto entity1 = std::make_shared<Entity>(XMFLOAT4(NX, NY, NZ, a), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
-	auto entity2 = std::make_shared<Entity>(XMFLOAT4(NX, NY, NZ, a), XMFLOAT3(6, 0, 6), XMFLOAT3(0, 0, -1));
-	auto entity3 = std::make_shared<Entity>(XMFLOAT4(NX, NY, NZ, a), XMFLOAT3(6, 0, 0), XMFLOAT3(0, 0, 0));
-	
+	auto entity1 = std::make_shared<Entity>(XMFLOAT4(NX, NY, NZ, a), initCond1, mat, EntityType::PlaneTriangle);
+	//auto entity2 = std::make_shared<Entity>(XMFLOAT4(NX, NY, NZ, a), initCond3, mat, EntityType::PlaneTriangle);
+	auto entity3 = std::make_shared<Entity>(XMFLOAT4(1.5, 11, 10, a), initCond2, mat, EntityType::Cylinder);
+
 
 	m_entities.push_back(entity1);
-	m_entities.push_back(entity2);
-	//m_entities.push_back(entity3);
+	//m_entities.push_back(entity2);
+	m_entities.push_back(entity3);
 	for (auto entity : m_entities)
 	{
 		for (int i = 0; i < entity->Particles().size(); i++)
 			m_particles.push_back(entity->Particles()[i]);
+		/*
 		for (int i = 0; i < entity->Connections().size(); i++)
 			m_connections.push_back(entity->Connections()[i]);
+			*/
 	}
-	//m_objects[8]->Position(XMFLOAT3(4, 1, -4));
-	//m_particles[m_particles.size()-1]->Position(XMFLOAT3((NX - 1) * a - 0.1, (NY - 1) * a + 0.1, - (NZ - 1) * a));
-	//for (auto obj : m_objects)
-		//obj->Velocity(XMFLOAT3(0.1, 0, 0));
-	//m_particles[0]->AngularVelocity(XMFLOAT3(0.5, 0, 0));
+
+
+
+	m_isFirstTimeStep = true;
 }
 
 void LogicClass::TimeStep()
 {
 	using namespace DirectX;
+	
 	for (auto entity : m_entities)
 	{
-		for (auto connection : entity->Connections())
+		for (auto it = entity->Connections().begin(); it!=entity->Connections().end(); )
 		{
+			auto connection = *it;
 			float dist = GeometricObject::DistanceIJ(connection->p1(), connection->p2());
+			if (abs((a - dist)) / a > entity->criticalDeformation)
+			{
+				connection->Break(entity->ContactParticles());
+				it = entity->Connections().erase(it);
+				continue;
+			}
+
 			XMVECTOR r_ij = connection->p2()->VectorPosition() - connection->p1()->VectorPosition();
 			XMVECTOR e_ij = r_ij / dist;
-			XMVECTOR f_ij = B1() * (dist - a) * e_ij +
-				B2() / 2 / dist * (connection->n_i2(1) - connection->n_i1(1) - XMVector3Dot(e_ij, connection->n_i2(1) - connection->n_i1(1)) * e_ij);
-			XMVECTOR MTB = B3() * XMVector3Cross(connection->n_i2(1), connection->n_i1(1)) -
-				B4() * 0.5 * (XMVector3Cross(connection->n_i2(2), connection->n_i1(2)) + XMVector3Cross(connection->n_i2(3), connection->n_i1(3)));
-			XMVECTOR m_ij = -B2() * 0.5 * XMVector3Cross(e_ij, connection->n_i1(1)) + MTB;
-			XMVECTOR m_ji = B2() * 0.5 * XMVector3Cross(e_ij, connection->n_i2(1)) - MTB;
+			XMVECTOR f_ij = entity->B1() * (dist - a) * e_ij +
+				entity->B2() / 2 / dist * (connection->n_i2(1) - connection->n_i1(1) - XMVector3Dot(e_ij, connection->n_i2(1) - connection->n_i1(1)) * e_ij);
+			XMVECTOR MTB = entity->B3() * XMVector3Cross(connection->n_i2(1), connection->n_i1(1)) -
+				entity->B4() * 0.5 * (XMVector3Cross(connection->n_i2(2), connection->n_i1(2)) + XMVector3Cross(connection->n_i2(3), connection->n_i1(3)));
+			XMVECTOR m_ij = -entity->B2() * 0.5 * XMVector3Cross(e_ij, connection->n_i1(1)) + MTB;
+			XMVECTOR m_ji = entity->B2() * 0.5 * XMVector3Cross(e_ij, connection->n_i2(1)) - MTB;
 
 			connection->p1()->Force() += f_ij;
 			connection->p2()->Force() -= f_ij;
 			connection->p1()->Moment() += m_ij;
 			connection->p2()->Moment() += m_ji;
+
+			++it;
+			
+			//connection->p1()->Moment() += XMVector3Transform(m_ij, XMMatrixTranspose(XMMatrixRotationQuaternion(connection->p1()->VectorQuaternion())));
+			//connection->p2()->Moment() += XMVector3Transform(m_ji, XMMatrixTranspose(XMMatrixRotationQuaternion(connection->p2()->VectorQuaternion())));
+			
 		}
+
+		for (int i = 0; i < (int)entity->Size().x; i++)
+			for (int j = 0; j < (int)entity->Size().y; j++)
+				if (entity->Particle(i, j, 0)->Position().y < 0)
+				{
+					auto arch_force = XMFLOAT3(0,
+						-5 * m_gravity.y * abs(entity->Particle(i, j, 0)->Position().y * (entity->Size().x - 1) * (entity->Size().y - 1) * entity->Size().w),
+						0);
+					entity->Particle(i, j, 0)->Force() += XMLoadFloat3(&arch_force);
+				}
+
 
 		for (auto another_entity : m_entities)
 			if (another_entity != entity)
-				for (auto particle : entity->Particles())
-					for (auto another_particle : another_entity->Particles())
+				for (auto particle : entity->ContactParticles())
+					for (auto another_particle : another_entity->ContactParticles())
 					{
 						float r = GeometricObject::DistanceIJ(particle, another_particle);
-						float f = LennardJones(r);
+						float f = Entity::LennardJones(r, a, 0.005);
 						DirectX::XMVECTOR e_ij = (another_particle->VectorPosition() - particle->VectorPosition()) / r;
 						particle->Force() += f * e_ij;
 					}
 
+		
 		for (auto particle : entity->Particles())
 		{
-			XMFLOAT3 ANG_VEL_3{ 0.f, 0.f, 0.f };
-			XMFLOAT4 QUAT{ 0.f, 0.f, 0.f , 0.f };
+			particle->Force() += XMLoadFloat3(&m_gravity);
 
-			auto v_new = particle->VectorVelocity() + vis * particle->VectorVelocity() + (!particle->m_isFixed) * particle->Force() / m * dt;
-			auto r_new = particle->VectorPosition() + v_new * dt;
-			auto av_new = particle->VectorAngularVelocity() + (!particle->m_isFixed) * particle->Moment() / J * dt;
+			if (particle->Position().y > 0)
+				vis = 0;
+			else
+				vis = 0.0001;
 
-			//auto av_new_rot = XMQuaternionMultiply(XMQuaternionInverse(particle->VectorQuaternion()), XMQuaternionMultiply(particle->VectorQuaternion(), av_new));
+			XMFLOAT3 constraint(1, 1, 1);
+			if (m_isFirstTimeStep)
+			{
+				particle->Velocity(particle->VectorVelocity() + 0.5 * dt * particle->Force() / m);
+				//particle->AngularVelocity(particle->VectorVelocity() + 0.5 * dt * particle->Moment() / J);
+			}
+				
 
-			XMStoreFloat3(&ANG_VEL_3, av_new);
-			XMFLOAT4 ANG_VEL_4(ANG_VEL_3.x, ANG_VEL_3.y, ANG_VEL_3.z, 0.f);
-			auto q_new = particle->VectorQuaternion() + 0.5 * XMQuaternionMultiply(XMLoadFloat4(&ANG_VEL_4), particle->VectorQuaternion()) * dt;
-
-
-			particle->Velocity(v_new);
-			particle->AngularVelocity(av_new);
-			particle->Position(r_new);
-			particle->Quaternion(q_new / XMQuaternionLength(q_new));
+			TranslationalIntegratorLeapFrog(particle);
+			RotationalIntegratorSymplectic(particle);
+			
+			if (!m_realTimeRender)
+				particle->AddTimePoint(particle->VectorPosition(), particle->VectorQuaternion());
 		}
+		
 		for (auto connection : entity->Connections())
 			connection->Update();
 		for (auto particle : entity->Particles())
 			particle->ResetForcesAndMoments();
+		if (m_isFirstTimeStep)
+			m_isFirstTimeStep = false;
 	}
 	
+}
+
+void LogicClass::AnimationStep(int i)
+{
+	for (auto p : m_particles)
+	{
+		p->Position(p->m_positions[i]);
+		p->Quaternion(p->m_orientations[i]);
+	}
+}
+
+void LogicClass::RotationalIntegratorSymplectic(const std::shared_ptr<Cube> particle)
+{
+	
+	XMVECTOR av_prev = particle->VectorAngularVelocity() * !m_isFirstTimeStep + particle->Moment() / J * (0.5 * dt);
+	XMStoreFloat3(&m_tempAngularVelocity3, av_prev);
+	m_tempAngularVelocity4 = XMFLOAT4(m_tempAngularVelocity3.x, m_tempAngularVelocity3.y, m_tempAngularVelocity3.z, 0.f);
+	XMVECTOR q_half_plus = particle->VectorQuaternion() + (0.5 * dt) * 0.5 * XMQuaternionMultiply(particle->VectorQuaternion(), XMLoadFloat4(&m_tempAngularVelocity4));
+
+	XMVECTOR av_half_plus = particle->VectorAngularVelocity() * !m_isFirstTimeStep + dt * particle->Moment() / J;
+	XMStoreFloat3(&m_tempAngularVelocity3, av_half_plus);
+	m_tempAngularVelocity4 = XMFLOAT4(m_tempAngularVelocity3.x, m_tempAngularVelocity3.y, m_tempAngularVelocity3.z, 0.f);
+	XMVECTOR q_new = particle->VectorQuaternion() + 0.5 * dt * XMQuaternionMultiply(q_half_plus, XMLoadFloat4(&m_tempAngularVelocity4));
+
+	particle->AngularVelocity(av_half_plus);
+	particle->Quaternion(q_new / XMQuaternionLength(q_new));
+	
+	/*
+	XMVECTOR L_prev_global = particle->KineticMoment() + (0.5 * dt) * particle->Moment();
+	XMVECTOR L_prev_local = XMVector3Transform(L_prev_global, XMMatrixRotationQuaternion(particle->VectorQuaternion()));
+	XMStoreFloat3(&m_tempAngularVelocity3, L_prev_local/J);
+	m_tempAngularVelocity4 = XMFLOAT4(m_tempAngularVelocity3.x, m_tempAngularVelocity3.y, m_tempAngularVelocity3.z, 0.f);
+	XMVECTOR q_half_plus = particle->VectorQuaternion() + (0.5 * dt) * 0.5 * XMQuaternionMultiply(particle->VectorQuaternion(), XMLoadFloat4(&m_tempAngularVelocity4));
+
+	XMVECTOR L_half_plus_global = particle->KineticMoment() + dt * particle->Moment();
+	XMVECTOR L_half_plus_local = XMVector3Transform(L_half_plus_global, XMMatrixRotationQuaternion(q_half_plus));
+	XMStoreFloat3(&m_tempAngularVelocity3, L_half_plus_local / J);
+	m_tempAngularVelocity4 = XMFLOAT4(m_tempAngularVelocity3.x, m_tempAngularVelocity3.y, m_tempAngularVelocity3.z, 0.f);
+	XMVECTOR q_new = particle->VectorQuaternion() + 0.5 * dt * XMQuaternionMultiply(q_half_plus, XMLoadFloat4(&m_tempAngularVelocity4));
+
+	particle->KineticMoment(L_half_plus_global);
+	particle->Quaternion(q_new / XMQuaternionLength(q_new));
+	*/
+}
+
+void LogicClass::RotationalIntegratorNonSymplectic(const std::shared_ptr<Cube> particle)
+{
+	XMVECTOR av_new = particle->VectorAngularVelocity() + particle->Moment() / J * dt;
+	XMStoreFloat3(&m_tempAngularVelocity3, av_new);
+	m_tempAngularVelocity4 = XMFLOAT4(m_tempAngularVelocity3.x, m_tempAngularVelocity3.y, m_tempAngularVelocity3.z, 0.f);
+	XMVECTOR q_new = particle->VectorQuaternion() + 0.5 * XMQuaternionMultiply(XMLoadFloat4(&m_tempAngularVelocity4), particle->VectorQuaternion()) * dt;
+
+	particle->AngularVelocity(av_new);
+	particle->Quaternion(q_new / XMQuaternionLength(q_new));
+}
+
+void LogicClass::TranslationalIntegratorLeapFrog(const std::shared_ptr<Cube> particle)
+{
+	XMVECTOR v_new = particle->VectorVelocity() + (-vis * particle->VectorVelocity() + (!particle->m_isFixed) * particle->Force() / m) * dt * !m_isFirstTimeStep;
+	XMVECTOR r_new = particle->VectorPosition() + v_new * dt;
+
+	particle->Velocity(v_new);
+	particle->Position(r_new);
 }
 

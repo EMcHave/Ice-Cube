@@ -11,35 +11,49 @@ Cube::Cube()
     m_position = XMFLOAT3(0.0f, 0.0f, 0.0f);
     m_force = XMVectorZero();
     m_moment = XMVectorZero();
+    m_numberOfConnections = 0;
+    m_isContact = false;
     Update();
 }
 
-Cube::Cube(XMFLOAT3 position, bool isFixed)
+Cube::Cube(XMFLOAT3 position, float scale, bool isFixed)
 {
+    m_numberOfConnections = 0;
+    m_scale = scale;
     m_isFixed = isFixed;
     m_position = position;
     m_force = XMVectorZero();
     m_moment = XMVectorZero();
     m_initialMatrix = XMMatrixIdentity();
+    m_isContact = false;
     Update();
 }
 
-Cube::Cube(DirectX::XMFLOAT3 position, XMVECTOR quat, bool isFixed)
+Cube::Cube(DirectX::XMFLOAT3 position, XMVECTOR quat, float scale, bool isFixed)
 {
+    m_numberOfConnections = 0;
+    m_scale = scale;
     m_isFixed = isFixed;
     m_position = position;
     XMStoreFloat4(&m_quaternion, quat);
     m_force = XMVectorZero();
     m_moment = XMVectorZero();
     m_initialMatrix = XMMatrixIdentity();
+    m_isContact = false;
+    Update();
+}
+
+void Cube::SetInitialQuaternion(XMVECTOR quaternion)
+{
+    m_initialMatrix = XMMatrixRotationQuaternion(quaternion);
     Update();
 }
 
 void Cube::Update()
 {
     XMStoreFloat4x4(
-        &m_modelMatrix, m_initialMatrix * 
-        XMMatrixScaling(0.5, 0.5, 0.5) * XMMatrixRotationQuaternion(VectorQuaternion()) *
+        &m_modelMatrix, 
+        XMMatrixScaling(m_scale, m_scale, m_scale) * m_initialMatrix * XMMatrixRotationQuaternion(VectorQuaternion()) *
         XMMatrixTranslation(m_position.x, m_position.y, m_position.z)
     );
 }

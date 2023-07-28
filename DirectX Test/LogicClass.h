@@ -1,4 +1,5 @@
 #pragma once
+#include <ppl.h>
 #include "Camera.h"
 #include "Cube.h"
 #include "Line.h"
@@ -6,7 +7,10 @@
 #include "MoveLookController.h"
 #include "Connection.h"
 
+
 class MyRenderer;
+
+
 
 class LogicClass
 {
@@ -23,45 +27,33 @@ public:
 	std::shared_ptr<Cube>& Object(int i) { return m_particles.at(i); };
 
 	void TimeStep();
+	void AnimationStep(int i);
 
-	float LennardJones(float r)
-	{
-		float D = 0.005;
-		float A = a;
+	void DT(float dt) { this->dt = dt; }
+	float DT() { return dt; }
 
-		return 12 * D / a * (pow(A / r, 7) - pow(A / r, 13));
-	}
+	bool IsRealTime() { return m_realTimeRender; }
+	void IsRealTime(bool isRealTime) { m_realTimeRender = isRealTime; }
 
-	float B1() 
-	{ 
-		//return E * S / a; 
-		//return (1 - nu) / (1 + nu) / (1 - 2 * nu) + E * S / a;
-		return 1;
-	}
-	float B2() {
-		//return 12 * k * a * E * J * S / (k * S * a * a + 24 * J * (1 + nu)); 
-		//return G * S * a;
-		return 1;
-	}
-	float B3() 
-	{ 
-		//return (1 - nu) / (1 + nu) / (1 - 2 * nu) + E * J / a - B2() / 4 - B4() / 2;
-		//return E * J / a - B2() / 4 - B4() / 2; 
-		return 1;
-	}
-	float B4() 
-	{ 
-		//return G * Jp / a;
-		return 1;
-	}
 private:
 	
+	void RotationalIntegratorSymplectic(const std::shared_ptr<Cube> particle);
+	void RotationalIntegratorNonSymplectic(const std::shared_ptr<Cube> particle);
+	void TranslationalIntegratorLeapFrog(const std::shared_ptr<Cube> particle);
+
 	std::shared_ptr<MoveLookController>				m_controller;
 	std::shared_ptr<MyRenderer>						m_renderer;
 	Camera											m_camera;
 	std::vector<std::shared_ptr<Cube>>				m_particles;
 	std::vector<std::shared_ptr<Entity>>			m_entities;
 	std::vector<std::shared_ptr<Connection>>		m_connections;
+
+	XMFLOAT3										m_gravity;
+	XMFLOAT4										m_tempAngularVelocity4;
+	XMFLOAT3										m_tempAngularVelocity3;
+	
+	bool											m_realTimeRender;
+	bool											m_isFirstTimeStep;
 
 	float dt;
 	float vis;

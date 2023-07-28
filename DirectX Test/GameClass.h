@@ -8,6 +8,7 @@
 #include "MoveLookController.h"
 #include "Camera.h"
 #include "MyRenderer.h"
+#include "Common/StepTimer.h"
 
 
 class GameClass : public winrt::implements<GameClass, winrt::Windows::Foundation::IInspectable>, DX::IDeviceNotify
@@ -18,8 +19,10 @@ public:
 	void CreateWindowSizeDependentResources();
 	void CreateDeviceDependentResources();
 	void AddObject(std::shared_ptr<Cube>);
-	void Update();
+	void Update(int i);
 	bool Render();
+
+	const std::shared_ptr<LogicClass> Logic() { return m_logic; }
 
 	int delta;
 
@@ -29,7 +32,7 @@ public:
 
 private:
 
-
+	DX::StepTimer										m_timer;
 
 	std::shared_ptr <LogicClass>						m_logic;
 
