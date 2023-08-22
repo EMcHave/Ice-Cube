@@ -28,7 +28,7 @@ struct Material
 class Entity
 {
 public:
-	const float criticalDeformation = 0.2;
+	const float criticalDeformation = 0.1;
 	Entity();
 	Entity(
 		DirectX::XMFLOAT4 size,
@@ -47,18 +47,25 @@ public:
 
 	void CreateOrthogonalMesh();
 	void CreateTriangularMesh1D();
-	void CreateCylinderMesh();
+	void CreateCylinderMesh(float coneAngle);
 
 	void RigidRotate(XMVECTOR, float);
+
+	bool static CheckIfConnectionExists(Cube* p1, Cube* p2);
+	bool CheckBreak(float dist, std::shared_ptr<Connection> c);
 
 	DirectX::XMFLOAT4 Size() { return m_size; }
 
 	static float LennardJones(float r, float A, float D)
 	{
+
 		if (r > A)
 			return 0;
-		else
+		else if (r <= A && r >= 0.9 * A)
 			return 12 * D / A * (pow(A / r, 7) - pow(A / r, 13));
+		else
+			return LennardJones(0.9 * A, r, D);
+			
 	}
 
 	float B1()
@@ -89,7 +96,7 @@ private:
 	std::vector<std::shared_ptr<Cube>>			m_contactParticles;
 	std::vector<std::shared_ptr<Cube>>			m_brokenParticles;
 
-	DirectX::XMFLOAT4							m_size;
+	DirectX::XMFLOAT4					m_size;
 	DirectX::XMFLOAT3							m_position;
 
 	Material									m_material;

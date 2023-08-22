@@ -85,7 +85,7 @@
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxBundle>Always</AppxBundle>
-    <AppxBundlePlatforms>x64</AppxBundlePlatforms>
+    <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
   </PropertyGroup>
   <ItemDefinitionGroup>
@@ -137,6 +137,7 @@
     <ClInclude Include="Line.h" />
     <ClInclude Include="LineMesh.h" />
     <ClInclude Include="LogicClass.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshObject.h" />
     <ClInclude Include="MoveLookController.h" />
     <ClInclude Include="MyRenderer.h" />
@@ -174,6 +175,7 @@
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="LineMesh.cpp" />
     <ClCompile Include="LogicClass.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshObject.cpp" />
     <ClCompile Include="MoveLookController.cpp" />
     <ClCompile Include="MyRenderer.cpp" />

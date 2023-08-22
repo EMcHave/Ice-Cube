@@ -27,8 +27,12 @@ Entity::Entity(
 		CreateOrthogonalMesh();
 		break;
 	case Cylinder:
-		CreateCylinderMesh();
+	{
+		float angle = 45;
+		//float angle = 0;
+		CreateCylinderMesh(angle * DirectX::XM_PI / 180);
 		break;
+	}
 	case Sphere:
 		break;
 	default:
@@ -54,7 +58,8 @@ void Entity::CreateOrthogonalMesh()
 		for (int j = 0; j < m_size.y; j++)
 			for (int i = 0; i < m_size.x; i++)
 			{
-				auto cube = std::make_shared<Cube>(XMFLOAT3(i * m_size.w + m_position.x, k * m_size.w + m_position.y, -j * m_size.w + m_position.z), m_size.w / 2,  false);
+				auto cube = std::make_shared<Cube>(
+					XMFLOAT3(i * m_size.w + m_position.x, k * m_size.w + m_position.y, -j * m_size.w + m_position.z), 0.5 * m_size.w, 0.75 * m_size.w, false);
 				m_particles.push_back(cube);
 			}
 
@@ -148,17 +153,19 @@ void Entity::CreateTriangularMesh1D()
 			std::shared_ptr<Cube> cube;
 			if (j % 2 == 0)
 			{
-				cube = std::make_shared<Cube>(XMFLOAT3(
+				cube = std::make_shared<Cube>(
+					XMFLOAT3(
 					i * m_size.w + m_position.x,
 					m_position.y,
-					-j * m_size.w * sinf(XM_PI / 3) + m_position.z), m_size.w * 0.75,  false);
+					-j * m_size.w * sinf(XM_PI / 3) + m_position.z), 0.5 * m_size.w, m_size.w * 0.75,  false);
 			}
 			else
 			{
-				cube = std::make_shared<Cube>(XMFLOAT3(
+				cube = std::make_shared<Cube>(
+					XMFLOAT3(
 					i * m_size.w + m_size.w * cosf(XM_PI / 3) + m_position.x,
 					m_position.y,
-					-j * m_size.w * sinf(XM_PI / 3) + m_position.z), m_size.w * 0.75, false);
+					-j * m_size.w * sinf(XM_PI / 3) + m_position.z), 0.5 * m_size.w, m_size.w * 0.75, false);
 			}
 				
 			m_particles.push_back(cube);
@@ -276,7 +283,7 @@ void Entity::CreateTriangularMesh1D()
 		}
 }
 
-void Entity::CreateCylinderMesh()
+void Entity::CreateCylinderMesh(float coneAngle)
 {
 	float r = m_size.x;
 	float dfi = m_size.w / r;
@@ -289,18 +296,21 @@ void Entity::CreateCylinderMesh()
 	for (int k = 0; k < m_size.z; k++)
 		for (int j = 0; j < NFI; j++)
 		{
-			auto cube = std::make_shared<Cube>(XMFLOAT3(
-				r * cosf(dfi * j) + m_position.x,
+			auto cube = std::make_shared<Cube>(
+				XMFLOAT3(
+				(r - k * m_size.w * tanf(coneAngle)) * cosf(dfi * j) + m_position.x,
 				k * m_size.w + m_position.y,
-				r * sinf(dfi * j) + m_position.z), m_size.w * 0.75, true);
+				(r - k * m_size.w * tanf(coneAngle)) * sinf(dfi * j) + m_position.z), 0.5 * m_size.w, m_size.w * 0.75, true);
 			XMVECTOR quat = XMQuaternionRotationNormal(XMLoadFloat3(&n2), -j * dfi);
-			cube->SetInitialQuaternion(quat);
+			XMVECTOR n1_rotated = XMVector3Rotate(XMLoadFloat3(&n3), quat);
+			XMVECTOR quat2 = XMQuaternionRotationNormal(n1_rotated, -coneAngle);
+			cube->SetInitialQuaternion(XMQuaternionMultiply(quat, quat2));
 			m_particles.push_back(cube);
 		}
 
 	for (auto p : m_particles)
 	{
-		if (abs(p->Position().y) < m_size.w * 2)
+		if (abs(p->Position().x) < 4.5)
 		{
 			m_contactParticles.push_back(p);
 			p->MakeContact();
@@ -390,4 +400,35 @@ void Entity::RigidRotate(XMVECTOR axis, float angle_rad)
 	}
 	for (auto c : m_connections)
 		c->Update();
+}
+
+bool Entity::CheckIfConnectionExists(Cube* p1, Cube* p2)
+{
+	for (auto c : p1->Connections())
+	{
+		if (c != nullptr)
+		{
+			if (c->p1().get() == p2)
+				return true;
+			else if (c->p2().get() == p2)
+				return true;
+		}
+	}
+	return false;
+}
+
+bool Entity::CheckBreak(float dist, std::shared_ptr<Connection> c)
+{
+	float tensile;
+	float shear;
+	XMVECTOR dR = c->p2()->VectorPosition() - c->p1()->VectorPosition();
+	XMVECTOR tensileVec = XMVector3Dot(dR, c->n_i1(1));
+	XMStoreFloat(&tensile, tensileVec);
+	shear = sqrt(dist * dist - tensile * tensile);
+	if ((tensile - m_size.w) / m_size.w > criticalDeformation)
+		return true;
+	else if (shear > 10 * m_size.w)
+		return true;
+	else
+		return false;
 }

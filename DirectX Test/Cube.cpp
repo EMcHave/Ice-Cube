@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Cube.h"
 #include "Line.h"
-#include "DirectXMath.h"
+#include <algorithm>
 
 using namespace DirectX;
 
@@ -16,12 +16,13 @@ Cube::Cube()
     Update();
 }
 
-Cube::Cube(XMFLOAT3 position, float scale, bool isFixed)
+Cube::Cube(XMFLOAT3 position, float radius, float scale, bool isFixed)
 {
     m_numberOfConnections = 0;
     m_scale = scale;
     m_isFixed = isFixed;
     m_position = position;
+    m_radius = radius;
     m_force = XMVectorZero();
     m_moment = XMVectorZero();
     m_initialMatrix = XMMatrixIdentity();
@@ -29,12 +30,13 @@ Cube::Cube(XMFLOAT3 position, float scale, bool isFixed)
     Update();
 }
 
-Cube::Cube(DirectX::XMFLOAT3 position, XMVECTOR quat, float scale, bool isFixed)
+Cube::Cube(DirectX::XMFLOAT3 position, XMVECTOR quat, float radius, float scale, bool isFixed)
 {
     m_numberOfConnections = 0;
     m_scale = scale;
     m_isFixed = isFixed;
     m_position = position;
+    m_radius = radius;
     XMStoreFloat4(&m_quaternion, quat);
     m_force = XMVectorZero();
     m_moment = XMVectorZero();
@@ -86,3 +88,20 @@ DirectX::XMFLOAT4 Cube::Quaternion()
 {
     return m_quaternion;
 }
+
+void Cube::RegisterConnection(Connection* con)
+{
+    m_numberOfConnections += 1;
+    m_connections.push_back(con);
+}
+
+void Cube::UnRegisterConnection(Connection* con)
+{
+    m_numberOfConnections -= 1;
+    auto rmv = std::remove_if(m_connections.begin(), m_connections.end(),
+        [&](Connection* el) {
+            return el == con;
+        });
+    m_connections.erase(rmv, m_connections.end());
+}
+

@@ -4,7 +4,11 @@
 #include "ConstantBuffers.h"
 
 //#include "DirectXMath.h"
-
+namespace Ice
+{
+	struct Cell;
+	class Mesh;
+}
 class GeometricObject
 {
 public:
@@ -41,10 +45,12 @@ public:
 	DirectX::XMVECTOR VectorQuaternion();
 	DirectX::XMVECTOR VectorQuaternionHalf();
 
+	std::shared_ptr<Ice::Cell> Cell() { return m_cell; }
+	void Cell(std::shared_ptr<Ice::Cell> cell) { m_cell = cell; }
+
 	bool									m_isFixed;
 	static float DistanceIJ(
-		std::shared_ptr<GeometricObject> const& obj_i,
-		std::shared_ptr<GeometricObject> const& obj_j);
+		GeometricObject* const& obj_i, GeometricObject* const& obj_j);
 
 protected:
 	DirectX::XMFLOAT4X4						m_modelMatrix;
@@ -56,9 +62,8 @@ protected:
 	DirectX::XMFLOAT3						m_kineticMoment;
 	DirectX::XMFLOAT4						m_quaternion;
 	DirectX::XMFLOAT4						m_quaternionHalf;
-	float									m_xAngle;
-	float									m_yAngle;
-	float									m_zAngle;
+	
+	std::shared_ptr<Ice::Cell>				m_cell;
 
 
 private:
@@ -183,7 +188,7 @@ inline DirectX::XMVECTOR GeometricObject::VectorQuaternionHalf()
 	return XMLoadFloat4(&m_quaternionHalf);
 }
 
-inline float GeometricObject::DistanceIJ(std::shared_ptr<GeometricObject> const& obj_i, std::shared_ptr<GeometricObject> const& obj_j)
+inline float GeometricObject::DistanceIJ(GeometricObject* const& obj_i, GeometricObject* const& obj_j)
 {
 	using namespace DirectX;
 	XMVECTOR vectorSub = XMVectorSubtract(obj_i->VectorPosition(), obj_j->VectorPosition());

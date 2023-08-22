@@ -6,7 +6,7 @@
 #include "Entity.h"
 #include "MoveLookController.h"
 #include "Connection.h"
-
+#include "Mesh.h"
 
 class MyRenderer;
 
@@ -39,7 +39,7 @@ private:
 	
 	void RotationalIntegratorSymplectic(const std::shared_ptr<Cube> particle);
 	void RotationalIntegratorNonSymplectic(const std::shared_ptr<Cube> particle);
-	void TranslationalIntegratorLeapFrog(const std::shared_ptr<Cube> particle);
+	void TranslationalIntegratorLeapFrog(const std::shared_ptr<Cube> particlew);
 
 	std::shared_ptr<MoveLookController>				m_controller;
 	std::shared_ptr<MyRenderer>						m_renderer;
@@ -47,6 +47,7 @@ private:
 	std::vector<std::shared_ptr<Cube>>				m_particles;
 	std::vector<std::shared_ptr<Entity>>			m_entities;
 	std::vector<std::shared_ptr<Connection>>		m_connections;
+	Ice::Mesh										m_mesh;
 
 	XMFLOAT3										m_gravity;
 	XMFLOAT4										m_tempAngularVelocity4;

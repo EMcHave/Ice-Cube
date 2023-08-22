@@ -55,7 +55,7 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
         m_main->CreateWindowSizeDependentResources();
 
         m_main->Logic()->IsRealTime(1);
-        m_main->Logic()->DT(pow(10, -1));
+        m_main->Logic()->DT(pow(10, -2));
 
         if (m_main->Logic()->IsRealTime())
         {

@@ -51,6 +51,9 @@
     </ClCompile>
     <ClCompile Include="Connection.cpp" />
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -123,6 +126,9 @@
     </ClInclude>
     <ClInclude Include="Connection.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="Mesh.h">
+      <Filter>Base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\SplashScreen.scale-200.png">

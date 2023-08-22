@@ -32,23 +32,29 @@ void LogicClass::Init(
 
 
 
+
 	int NX = 10;
 	int NY = 20;
 	int NZ = 1;
 
-	InitialConditions initCond1 { XMFLOAT3(0, 0, 8), XMFLOAT3(0.2, -0, 0) };
-	InitialConditions initCond2 { XMFLOAT3(7, 0, 0), XMFLOAT3(0, 0, 0) };
-	InitialConditions initCond3 { XMFLOAT3(6, 0, 6), XMFLOAT3(0, 0, -0.5) };
+	InitialConditions initCond1 { XMFLOAT3(0, 0, 4), XMFLOAT3(0.25, 0, 0) };
+	InitialConditions initCond2 { XMFLOAT3(4.5, -0.5, 1.5), XMFLOAT3(0, 0, 0) };
+	//InitialConditions initCond3 { XMFLOAT3(6, 0, 12), XMFLOAT3(0, 0, -0.2) };
 	Material mat{ E, G, nu, rho };
 	
-	auto entity1 = std::make_shared<Entity>(XMFLOAT4(NX, NY, NZ, a), initCond1, mat, EntityType::PlaneTriangle);
+	auto entity1 = std::make_shared<Entity>(XMFLOAT4(NX, NY, NZ, 0.5 * a), initCond1, mat, EntityType::PlaneTriangle);
 	//auto entity2 = std::make_shared<Entity>(XMFLOAT4(NX, NY, NZ, a), initCond3, mat, EntityType::PlaneTriangle);
-	auto entity3 = std::make_shared<Entity>(XMFLOAT4(1.5, 11, 10, a), initCond2, mat, EntityType::Cylinder);
-
+	auto entity3 = std::make_shared<Entity>(XMFLOAT4(2, 6, 10, 0.25 * a), initCond2, mat, EntityType::Cylinder);
+	//auto entity3 = std::make_shared<Entity>(XMFLOAT4(1.5, 11, 10, a), initCond2, mat, EntityType::Cylinder);
 
 	m_entities.push_back(entity1);
 	//m_entities.push_back(entity2);
 	m_entities.push_back(entity3);
+
+	XMFLOAT3 meshSize(50, 50, 10);
+	m_mesh = Ice::Mesh(meshSize, 2 * max(m_entities[0]->Size().w, m_entities[1]->Size().w));
+
+
 	for (auto entity : m_entities)
 	{
 		for (int i = 0; i < entity->Particles().size(); i++)
@@ -60,30 +66,43 @@ void LogicClass::Init(
 	}
 
 
-
+	
 	m_isFirstTimeStep = true;
 }
 
 void LogicClass::TimeStep()
 {
 	using namespace DirectX;
-	
-	for (auto entity : m_entities)
+	/*
+	for (auto e : m_entities)
+		for (auto p : e->Particles())
+		{
+			DirectX::XMFLOAT3 pos = p->Position();
+			std::shared_ptr<Ice::Cell> cell = m_mesh.CellByPosition(p->Position());
+			if (cell.get() != nullptr)
+				cell->AddParticle(p.get());
+		}
+	*/
+
+	for (int e = 0; e < m_entities.size(); e++)
 	{
+		auto entity = m_entities[e];
+
 		for (auto it = entity->Connections().begin(); it!=entity->Connections().end(); )
 		{
 			auto connection = *it;
-			float dist = GeometricObject::DistanceIJ(connection->p1(), connection->p2());
-			if (abs((a - dist)) / a > entity->criticalDeformation)
+			float dist = GeometricObject::DistanceIJ(connection->p1().get(), connection->p2().get());
+			
+			if (entity->CheckBreak(dist, connection))
 			{
 				connection->Break(entity->ContactParticles());
 				it = entity->Connections().erase(it);
 				continue;
 			}
-
+			
 			XMVECTOR r_ij = connection->p2()->VectorPosition() - connection->p1()->VectorPosition();
 			XMVECTOR e_ij = r_ij / dist;
-			XMVECTOR f_ij = entity->B1() * (dist - a) * e_ij +
+			XMVECTOR f_ij = entity->B1() * (dist - entity->Size().w) * e_ij +
 				entity->B2() / 2 / dist * (connection->n_i2(1) - connection->n_i1(1) - XMVector3Dot(e_ij, connection->n_i2(1) - connection->n_i1(1)) * e_ij);
 			XMVECTOR MTB = entity->B3() * XMVector3Cross(connection->n_i2(1), connection->n_i1(1)) -
 				entity->B4() * 0.5 * (XMVector3Cross(connection->n_i2(2), connection->n_i1(2)) + XMVector3Cross(connection->n_i2(3), connection->n_i1(3)));
@@ -100,8 +119,8 @@ void LogicClass::TimeStep()
 			//connection->p1()->Moment() += XMVector3Transform(m_ij, XMMatrixTranspose(XMMatrixRotationQuaternion(connection->p1()->VectorQuaternion())));
 			//connection->p2()->Moment() += XMVector3Transform(m_ji, XMMatrixTranspose(XMMatrixRotationQuaternion(connection->p2()->VectorQuaternion())));
 			
-		}
-
+		}	
+	
 		for (int i = 0; i < (int)entity->Size().x; i++)
 			for (int j = 0; j < (int)entity->Size().y; j++)
 				if (entity->Particle(i, j, 0)->Position().y < 0)
@@ -111,18 +130,59 @@ void LogicClass::TimeStep()
 						0);
 					entity->Particle(i, j, 0)->Force() += XMLoadFloat3(&arch_force);
 				}
+		
 
-
-		for (auto another_entity : m_entities)
-			if (another_entity != entity)
-				for (auto particle : entity->ContactParticles())
-					for (auto another_particle : another_entity->ContactParticles())
+		
+		
+		for (int ae = e + 1; ae < m_entities.size(); ae++)
+		{
+			auto another_entity = m_entities[ae];
+			for (auto particle : entity->ContactParticles())
+				for (auto another_particle : another_entity->ContactParticles())
+				{
+					float r = GeometricObject::DistanceIJ(particle.get(), another_particle.get());
+					float f = Entity::LennardJones(r, particle->R() + another_particle->R(), 0.1);
+					DirectX::XMVECTOR e_ij = (another_particle->VectorPosition() - particle->VectorPosition()) / r;
+					particle->Force() += f * e_ij;
+					another_particle->Force() -= f * e_ij;
+				}
+		}
+		
+		for (int i = 0; i < entity->ContactParticles().size(); i++)
+			for (int j = i + 1; j < entity->ContactParticles().size(); j++)
+			{
+				auto p1 = entity->ContactParticles().at(i);
+				auto p2 = entity->ContactParticles().at(j);
+				if (!Entity::CheckIfConnectionExists(p1.get(), p2.get()))
+				{
+					float r = GeometricObject::DistanceIJ(p1.get(), p2.get());
+					float f = Entity::LennardJones(r, p1->R() + p2->R(), 0.1);
+					DirectX::XMVECTOR e_ij = (p2->VectorPosition() - p1->VectorPosition()) / r;
+					p1->Force() += f * e_ij;
+					p2->Force() -= f * e_ij;
+				}
+			}
+		
+		/*
+		for (auto cell : m_mesh.Cells())
+			for (int i = 0; i < cell->Particles().size(); i++)
+				for (int j = i + 1; j < cell->Particles().size(); j++)
+				{
+					Cube* p1 = dynamic_cast<Cube*>(cell->Particles().at(i));
+					Cube* p2 = dynamic_cast<Cube*>(cell->Particles().at(j));
+					if (!Entity::CheckIfConnectionExists(p1, p2))
 					{
-						float r = GeometricObject::DistanceIJ(particle, another_particle);
-						float f = Entity::LennardJones(r, a, 0.005);
-						DirectX::XMVECTOR e_ij = (another_particle->VectorPosition() - particle->VectorPosition()) / r;
-						particle->Force() += f * e_ij;
+						float r = GeometricObject::DistanceIJ(p1, p2);
+						float f = Entity::LennardJones(r, p1->R() + p2->R(), 0.1);
+						DirectX::XMVECTOR e_ij = (p2->VectorPosition() - p1->VectorPosition()) / r;
+						p1->Force() += f * e_ij;
+						p2->Force() -= f * e_ij;
 					}
+				}
+		*/
+
+		
+
 
 		
 		for (auto particle : entity->Particles())
@@ -132,7 +192,7 @@ void LogicClass::TimeStep()
 			if (particle->Position().y > 0)
 				vis = 0;
 			else
-				vis = 0.0001;
+				vis = 0.0005;
 
 			XMFLOAT3 constraint(1, 1, 1);
 			if (m_isFirstTimeStep)
@@ -153,10 +213,15 @@ void LogicClass::TimeStep()
 			connection->Update();
 		for (auto particle : entity->Particles())
 			particle->ResetForcesAndMoments();
+			
 		if (m_isFirstTimeStep)
 			m_isFirstTimeStep = false;
 	}
-	
+	/*
+	for (auto cell : m_mesh.Cells())
+		if (!cell->isEmpty)
+			cell->Clear();
+			*/
 }
 
 void LogicClass::AnimationStep(int i)
@@ -171,12 +236,12 @@ void LogicClass::AnimationStep(int i)
 void LogicClass::RotationalIntegratorSymplectic(const std::shared_ptr<Cube> particle)
 {
 	
-	XMVECTOR av_prev = particle->VectorAngularVelocity() * !m_isFirstTimeStep + particle->Moment() / J * (0.5 * dt);
+	XMVECTOR av_prev = particle->VectorAngularVelocity() * !m_isFirstTimeStep + (!particle->m_isFixed) * particle->Moment() / J * (0.5 * dt);
 	XMStoreFloat3(&m_tempAngularVelocity3, av_prev);
 	m_tempAngularVelocity4 = XMFLOAT4(m_tempAngularVelocity3.x, m_tempAngularVelocity3.y, m_tempAngularVelocity3.z, 0.f);
 	XMVECTOR q_half_plus = particle->VectorQuaternion() + (0.5 * dt) * 0.5 * XMQuaternionMultiply(particle->VectorQuaternion(), XMLoadFloat4(&m_tempAngularVelocity4));
 
-	XMVECTOR av_half_plus = particle->VectorAngularVelocity() * !m_isFirstTimeStep + dt * particle->Moment() / J;
+	XMVECTOR av_half_plus = particle->VectorAngularVelocity() * (!particle->m_isFixed) * !m_isFirstTimeStep + dt * particle->Moment() / J;
 	XMStoreFloat3(&m_tempAngularVelocity3, av_half_plus);
 	m_tempAngularVelocity4 = XMFLOAT4(m_tempAngularVelocity3.x, m_tempAngularVelocity3.y, m_tempAngularVelocity3.z, 0.f);
 	XMVECTOR q_new = particle->VectorQuaternion() + 0.5 * dt * XMQuaternionMultiply(q_half_plus, XMLoadFloat4(&m_tempAngularVelocity4));

@@ -1,7 +1,8 @@
 #pragma once
 #include "Cube.h"
+#include "Line.h"
 
-class Connection
+class Connection : std::enable_shared_from_this<Connection>
 {
 public:
 	Connection(

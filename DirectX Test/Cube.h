@@ -1,13 +1,14 @@
 #pragma once
+#include "GeometricObject.h"
 
-#include "Line.h"
 using namespace DirectX;
+class Connection;
 class Cube : public GeometricObject
 {
 public:
 	Cube();
-	Cube(DirectX::XMFLOAT3 pos, float, bool);
-	Cube(DirectX::XMFLOAT3 pos, DirectX::XMVECTOR quat, float, bool);
+	Cube(DirectX::XMFLOAT3 pos, float, float, bool);
+	Cube(DirectX::XMFLOAT3 pos, DirectX::XMVECTOR quat, float, float, bool);
 
 	void SetInitialQuaternion(XMVECTOR);
 
@@ -18,9 +19,12 @@ public:
 	void Quaternion(DirectX::XMVECTOR quaternion);
 	DirectX::XMFLOAT4 Quaternion();
 
-	void RegisterConnection() { m_numberOfConnections += 1; }
-	void UnRegisterConnection() { m_numberOfConnections -= 1; }
+	void RegisterConnection(Connection* con);
+	void UnRegisterConnection(Connection* con);
 	uint32_t NumberOfConnections() { return m_numberOfConnections; }
+	std::vector<Connection*>& Connections() { return m_connections; }
+
+	float R() { return m_radius; }
 
 	void Force(DirectX::XMVECTOR f) { m_force = f; }
 	DirectX::XMVECTOR& Force() { return m_force; }
@@ -50,10 +54,12 @@ private:
 	
 
 
-	DirectX::XMVECTOR						m_force;
-	DirectX::XMVECTOR						m_moment;
-	uint32_t								m_numberOfConnections;
-	float									m_scale;
-	bool									m_isContact;
+	DirectX::XMVECTOR								m_force;
+	DirectX::XMVECTOR								m_moment;
+	uint32_t										m_numberOfConnections;
+	std::vector<Connection*>						m_connections;
+	float											m_radius;
+	float											m_scale;
+	bool											m_isContact;
 };
 

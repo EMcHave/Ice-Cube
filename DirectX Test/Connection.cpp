@@ -12,8 +12,8 @@ Connection::Connection(
 	m_vectors2(v2)
 {
 	m_isBroken = false;
-	p1->RegisterConnection();
-	p2->RegisterConnection();
+ 	p1->RegisterConnection(this);
+	p2->RegisterConnection(this);
 }
 
 void Connection::Update()
@@ -36,8 +36,8 @@ void Connection::Update()
 void Connection::Break(std::vector<std::shared_ptr<Cube>>& contactParticles)
 {
 	m_isBroken = true;
-	m_particle1->UnRegisterConnection();
-	m_particle2->UnRegisterConnection();
+	m_particle1->UnRegisterConnection(this);
+	m_particle2->UnRegisterConnection(this);
 	if (!m_particle1->IsContact())
 	{
 		contactParticles.push_back(m_particle1);
