@@ -163,6 +163,9 @@
     <None Include="DirectX Test_TemporaryKey.pfx">
       <Filter>Project Properties</Filter>
     </None>
+    <None Include="Content\ConstantBuffers.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">

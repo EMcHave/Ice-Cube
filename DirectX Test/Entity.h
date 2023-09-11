@@ -1,6 +1,7 @@
 #pragma once
 #include "Cube.h"
 #include "Connection.h"
+#include <random>
 
 enum EntityType
 {
@@ -9,6 +10,12 @@ enum EntityType
 	SolidQuad,
 	Cylinder,
 	Sphere
+};
+
+enum Behavior
+{
+	Flexible, 
+	Rigid
 };
 
 struct InitialConditions
@@ -28,13 +35,14 @@ struct Material
 class Entity
 {
 public:
-	const float criticalDeformation = 0.1;
+	const float criticalDeformation = 0.05;
 	Entity();
 	Entity(
 		DirectX::XMFLOAT4 size,
 		InitialConditions initialConditions,
 		Material material,
-		EntityType type);
+		EntityType type, 
+		Behavior behavior);
 	void SetInitialConditions(DirectX::XMFLOAT3 velocity);
 	float V() { return m_size.w * (m_size.x - 1) * (m_size.y - 1) * (m_size.z - 1); }
 
@@ -55,6 +63,7 @@ public:
 	bool CheckBreak(float dist, std::shared_ptr<Connection> c);
 
 	DirectX::XMFLOAT4 Size() { return m_size; }
+	Behavior GetBehavior() { return m_behavior; }
 
 	static float LennardJones(float r, float A, float D)
 	{
@@ -96,11 +105,13 @@ private:
 	std::vector<std::shared_ptr<Cube>>			m_contactParticles;
 	std::vector<std::shared_ptr<Cube>>			m_brokenParticles;
 
-	DirectX::XMFLOAT4					m_size;
+
+
+	DirectX::XMFLOAT4							m_size;
 	DirectX::XMFLOAT3							m_position;
 
+	EntityType									m_entityType;
 	Material									m_material;
-
-	
+	Behavior									m_behavior;
 };
 

@@ -10,9 +10,11 @@ CubeMesh::CubeMesh(_In_opt_ bool isLine, _In_ winrt::com_ptr<ID3D11Device3> cons
     const D3D11_INPUT_ELEMENT_DESC PNTVertexLayout[] =
     {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "COLOR",    0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR",    0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
 
+    /*
     PNTVertex cubeVertices[] =
     {
         { float3(-0.5f, 0.5f, -0.5f), float3(0.0f, 1.0f, 0.0f) }, // +Y (top face)
@@ -25,6 +27,43 @@ CubeMesh::CubeMesh(_In_opt_ bool isLine, _In_ winrt::com_ptr<ID3D11Device3> cons
         { float3(0.5f, -0.5f, -0.5f), float3(1.0f, 0.0f, 0.0f) },
         { float3(-0.5f, -0.5f, -0.5f), float3(0.0f, 0.0f, 0.0f) },
     };
+    */
+
+    const float4 color = float4(0.53f, 0.81f, 0.94f, 0.0f);
+    
+
+    PNTVertex cubeVertices[] =
+    {
+        { float3(-0.5f, 0.5f, -0.5f), float3(0.0f, 1.0f, 0.0f), color }, // +Y (top face)
+        { float3(0.5f, 0.5f, -0.5f), float3(0.0f, 1.0f, 0.0f), color },
+        { float3(0.5f, 0.5f,  0.5f), float3(0.0f, 1.0f, 0.0f), color },
+        { float3(-0.5f, 0.5f,  0.5f), float3(0.0f, 1.0f, 0.0f), color },
+
+        { float3(-0.5f, -0.5f,  0.5f), float3(0.0f, -1.0f, 0.0f), color }, // -Y (bottom face)
+        { float3(0.5f, -0.5f,  0.5f), float3(0.0f, -1.0f, 0.0f), color },
+        { float3(0.5f, -0.5f, -0.5f), float3(0.0f, -1.0f, 0.0f), color },
+        { float3(-0.5f, -0.5f, -0.5f), float3(0.0f, -1.0f, 0.0f), color },
+
+        { float3(0.5f,  0.5f,  0.5f), float3(1.0f, 0.0f, 0.0f), color }, // +X (right face)
+        { float3(0.5f,  0.5f, -0.5f), float3(1.0f, 0.0f, 0.0f), color },
+        { float3(0.5f, -0.5f, -0.5f), float3(1.0f, 0.0f, 0.0f), color },
+        { float3(0.5f, -0.5f,  0.5f), float3(1.0f, 0.0f, 0.0f), color },
+
+        { float3(-0.5f,  0.5f, -0.5f), float3(-1.0f, 0.0f, 0.0f), color }, // -X (left face)
+        { float3(-0.5f,  0.5f,  0.5f), float3(-1.0f, 0.0f, 0.0f), color },
+        { float3(-0.5f, -0.5f,  0.5f), float3(-1.0f, 0.0f, 0.0f), color },
+        { float3(-0.5f, -0.5f, -0.5f), float3(-1.0f, 0.0f, 0.0f), color },
+
+        { float3(-0.5f,  0.5f, 0.5f), float3(0.0f, 0.0f, 1.0f), color }, // +Z (front face)
+        { float3(0.5f,  0.5f, 0.5f), float3(0.0f, 0.0f, 1.0f), color },
+        { float3(0.5f, -0.5f, 0.5f), float3(0.0f, 0.0f, 1.0f), color },
+        { float3(-0.5f, -0.5f, 0.5f), float3(0.0f, 0.0f, 1.0f), color },
+
+        { float3(0.5f,  0.5f, -0.5f), float3(0.0f, 0.0f, -1.0f), color }, // -Z (back face)
+        { float3(-0.5f,  0.5f, -0.5f), float3(0.0f, 0.0f, -1.0f), color },
+        { float3(-0.5f, -0.5f, -0.5f), float3(0.0f, 0.0f, -1.0f), color },
+        { float3(0.5f, -0.5f, -0.5f), float3(0.0f, 0.0f, -1.0f), color },
+    };
 
     unsigned short cubeIndices[] =
     {
@@ -34,17 +73,17 @@ CubeMesh::CubeMesh(_In_opt_ bool isLine, _In_ winrt::com_ptr<ID3D11Device3> cons
         4, 5, 6,
         4, 6, 7,
 
-        3, 2, 5,
-        3, 5, 4,
+        8, 9, 10,
+        8, 10, 11,
 
-        2, 1, 6,
-        2, 6, 5,
+        12, 13, 14,
+        12, 14, 15,
 
-        1, 7, 6,
-        1, 0, 7,
+        16, 17, 18,
+        16, 18, 19,
 
-        0, 3, 4,
-        0, 4, 7
+        20, 21, 22,
+        20, 22, 23
     };
 
     m_vertexCount = ARRAYSIZE(cubeVertices);

@@ -14,6 +14,7 @@ public:
 	void Update();
 	void Break(std::vector<std::shared_ptr<Cube>>& contactParticles);
 	bool isBroken() { return m_isBroken; }
+	float Delta() { return deltaStiffness; }
 	const std::shared_ptr<Cube> p1() { return m_particle1; }
 	const std::shared_ptr<Cube> p2() { return m_particle2; }
 
@@ -27,6 +28,7 @@ public:
 	const std::array<std::shared_ptr<Line>, 3>& vectors2() { return m_vectors2; }
 private:
 	bool									m_isBroken;
+	float									deltaStiffness;
 	std::shared_ptr<Cube>					m_particle1;
 	std::shared_ptr<Cube>					m_particle2;
 

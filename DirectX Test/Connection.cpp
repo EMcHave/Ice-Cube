@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Connection.h"
+#include <random>
 
 Connection::Connection(
 	std::shared_ptr<Cube> p1,
@@ -14,6 +15,13 @@ Connection::Connection(
 	m_isBroken = false;
  	p1->RegisterConnection(this);
 	p2->RegisterConnection(this);
+
+	float percent = 25;
+
+	static std::default_random_engine e;
+	static std::uniform_real_distribution<> dis(0, 2 * percent);
+
+	deltaStiffness = (dis(e) - percent) * 0.01;
 }
 
 void Connection::Update()

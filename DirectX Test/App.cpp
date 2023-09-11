@@ -54,8 +54,11 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
         m_main->CreateDeviceDependentResources();
         m_main->CreateWindowSizeDependentResources();
 
-        m_main->Logic()->IsRealTime(1);
-        m_main->Logic()->DT(pow(10, -2));
+        InteractionModel interactionModel = InteractionModel::MeshBased;
+
+        m_main->Logic()->SetInteractionModel(interactionModel);
+        m_main->Logic()->IsRealTime(false);
+        m_main->Logic()->DT(pow(10, -3));
 
         if (m_main->Logic()->IsRealTime())
         {
@@ -70,9 +73,9 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
         }
         else
         {
-            float time = 2;
+            float time = 20;
             int N = time / m_main->Logic()->DT();
-
+         
             int dt = N / (time * 60);
 
             //m_window.get().Dispatcher().ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);

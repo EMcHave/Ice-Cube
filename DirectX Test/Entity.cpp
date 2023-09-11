@@ -10,11 +10,14 @@ Entity::Entity(
 	DirectX::XMFLOAT4 size,
 	InitialConditions initialConditions,
 	Material material,
-	EntityType type)
+	EntityType type,
+	Behavior behavior)
 {
 	m_size = size;
 	m_position = initialConditions.position;
 	m_material = material;
+	m_entityType = type;
+	m_behavior = behavior;
 
 	switch (type)
 	{

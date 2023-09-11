@@ -42,6 +42,8 @@ private:
 
     winrt::com_ptr<ID3D11Buffer>                m_vertexBuffer;
     winrt::com_ptr<ID3D11Buffer>                m_indexBuffer;
+
+    winrt::com_ptr<ID3D11Buffer>                m_constantBufferNeverChanges;
     winrt::com_ptr<ID3D11Buffer>                m_constantBufferChangeOnResize;
     winrt::com_ptr<ID3D11Buffer>                m_constantBufferChangesEveryFrame;
     winrt::com_ptr<ID3D11Buffer>                m_constantBufferChangesEveryPrim;

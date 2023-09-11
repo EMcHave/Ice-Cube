@@ -38,6 +38,7 @@ namespace Ice
 		Mesh(DirectX::XMFLOAT3 size, float radius);
 		
 		void CleanCells();
+		DirectX::XMFLOAT3 Size() { return DirectX::XMFLOAT3(NX, NY, NZ); }
 		std::vector<std::shared_ptr<Ice::Cell>>& Cells() { return cells; }
 		
 		std::shared_ptr<Ice::Cell> CellByPosition(DirectX::XMFLOAT3 pos);

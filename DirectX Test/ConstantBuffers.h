@@ -7,7 +7,8 @@ using namespace winrt::Windows::Foundation::Numerics;
 struct PNTVertex
 {
     float3 pos;   // Position
-    float3 color; // Color
+    float3 normal; // Color
+    float4 color;
 };
 
 struct ConstantBufferChangeOnResize
@@ -23,4 +24,11 @@ struct ConstantBufferChangesEveryFrame
 struct ConstantBufferChangesEveryPrim
 {
     DirectX::XMFLOAT4X4 world;
+};
+
+struct ConstantBufferNeverChanges
+{
+    float4 lightDirection;
+    float4 lightColor;
+    float ambient_factor;
 };

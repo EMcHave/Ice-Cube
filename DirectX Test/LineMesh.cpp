@@ -8,23 +8,24 @@ LineMesh::LineMesh(bool isLine, Axis axis, winrt::com_ptr<ID3D11Device3> const& 
     const D3D11_INPUT_ELEMENT_DESC PNTVertexLayout[] =
     {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "COLOR",    0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR",    0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
 
-    float3 color;
+    float4 color;
     switch (axis)
     {
     case X:
-        color = float3(1.f, 0.f, 0.f);
+        color = float4(1.f, 0.f, 0.f, 1.f);
         break;
     case Y:
-        color = float3(0.f, 1.f, 0.f);
+        color = float4(0.f, 1.f, 0.f, 1.f);
         break;
     case Z:
-        color = float3(0.f, 0.f, 1.f);
+        color = float4(0.f, 0.f, 1.f, 1.f);
         break;
     case W:
-        color = float3(1.f, 1.f, 1.f);
+        color = float4(1.f, 1.f, 1.f, 1.f);
         break;
     default:
         break;
@@ -32,8 +33,8 @@ LineMesh::LineMesh(bool isLine, Axis axis, winrt::com_ptr<ID3D11Device3> const& 
 
     PNTVertex cubeVertices[] =
     {
-        { float3(-0.5f, 0.f, 0.f), color }, // +Y (top face)
-        { float3(0.5f, 0.f, 0.f), color },
+        { float3(-0.5f, 0.f, 0.f), float3(0.f, 1.f, 0.f), color },
+        { float3(0.5f, 0.f, 0.f), float3(0.f, 1.f, 0.f), color },
     };
 
     unsigned short cubeIndices[] =

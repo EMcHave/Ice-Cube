@@ -23,7 +23,6 @@ void GeometricObject::Render(
     _In_ ID3D11Buffer* primitiveConstantBuffer
 )
 {
-
     ConstantBufferChangesEveryPrim constantBuffer;
 
     XMStoreFloat4x4(

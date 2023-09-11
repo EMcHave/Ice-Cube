@@ -184,6 +184,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Content\ConstantBuffers.hlsli" />
     <None Include="DirectX Test_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="PropertySheet.props" />
