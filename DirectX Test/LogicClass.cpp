@@ -37,12 +37,12 @@ void LogicClass::Init(
 	float iceLength = 2;
 	float iceWidth = 4;
 
-	int NX = 30;
-	int NY = 60;
+	int NX = 20;
+	int NY = 40;
 	int NZ = 1;
 
 	float a1 = iceLength / NX;
-	float a2 = 0.05;
+	float a2 = 0.075;
 
 	InitialConditions initCond1 { XMFLOAT3(-2, 0, 3), XMFLOAT3(0.05, 0, 0) };
 	InitialConditions initCond2 { XMFLOAT3(0.6, -0.5, 0), XMFLOAT3(0, 0, 0) };
@@ -57,7 +57,7 @@ void LogicClass::Init(
 		Behavior::Flexible);
 	//auto entity2 = std::make_shared<Entity>(XMFLOAT4(NX, NY, NZ, a), initCond3, mat, EntityType::PlaneTriangle);
 	auto entity3 = std::make_shared<Entity>(
-		XMFLOAT4(1, 3, 20, a2),
+		XMFLOAT4(1, 3, 12, a2),
 		initCond2,
 		mat,
 		EntityType::Cylinder,
@@ -69,7 +69,7 @@ void LogicClass::Init(
 	//m_entities.push_back(entity2);
 	m_entities.push_back(entity3);
 
-	const XMFLOAT3 meshSize(3, 4, 3);
+	const XMFLOAT3 meshSize(3, 3, 3);
 	const float cellSize = min(m_entities[0]->Size().w, m_entities[1]->Size().w);
 	m_mesh = Ice::Mesh(meshSize, 2 * cellSize);
 	

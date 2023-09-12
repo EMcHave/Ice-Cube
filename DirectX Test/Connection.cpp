@@ -46,6 +46,8 @@ void Connection::Break(std::vector<std::shared_ptr<Cube>>& contactParticles)
 	m_isBroken = true;
 	m_particle1->UnRegisterConnection(this);
 	m_particle2->UnRegisterConnection(this);
+
+
 	if (!m_particle1->IsContact())
 	{
 		contactParticles.push_back(m_particle1);

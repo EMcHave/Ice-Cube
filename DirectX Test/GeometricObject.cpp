@@ -5,6 +5,7 @@ using namespace DirectX;
 
 GeometricObject::GeometricObject()
 {
+    m_context = nullptr;
     m_position = XMFLOAT3(0.0f, 0.0f, 0.0f);
     m_velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
     m_angularVelocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -23,6 +24,8 @@ void GeometricObject::Render(
     _In_ ID3D11Buffer* primitiveConstantBuffer
 )
 {
+    if(m_context == nullptr)
+        m_context = context;
     ConstantBufferChangesEveryPrim constantBuffer;
 
     XMStoreFloat4x4(

@@ -108,10 +108,10 @@ void MyRenderer::CreateDeviceDependentResources(_In_ std::shared_ptr<LogicClass>
         0
     );
 
-    auto cubeMesh = std::make_shared<CubeMesh>(false, d3dDevice);
+    //auto cubeMesh = std::make_shared<CubeMesh>(false, d3dDevice);
     
     for (auto&& object : m_objects)
-        object->Mesh(cubeMesh);
+        object->Mesh(std::make_shared<CubeMesh>(false, d3dDevice));
 
     m_lines.at(0)->Mesh(std::make_shared<LineMesh>(true, Axis::X, d3dDevice));
     m_lines.at(1)->Mesh(std::make_shared<LineMesh>(true, Axis::Y, d3dDevice));

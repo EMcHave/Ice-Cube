@@ -47,6 +47,7 @@ public:
 
 	std::shared_ptr<Ice::Cell> Cell() { return m_cell; }
 	void Cell(std::shared_ptr<Ice::Cell> cell) { m_cell = cell; }
+	void UpdateColor(winrt::Windows::Foundation::Numerics::float4 color);
 
 	bool									m_isFixed;
 	static float DistanceIJ(
@@ -65,6 +66,7 @@ protected:
 	
 	std::shared_ptr<Ice::Cell>				m_cell;
 
+	ID3D11DeviceContext*					m_context;
 
 private:
 	virtual void UpdatePosition() {};
@@ -186,6 +188,11 @@ inline DirectX::XMVECTOR GeometricObject::VectorQuaternion()
 inline DirectX::XMVECTOR GeometricObject::VectorQuaternionHalf()
 {
 	return XMLoadFloat4(&m_quaternionHalf);
+}
+
+inline void GeometricObject::UpdateColor(winrt::Windows::Foundation::Numerics::float4 color)
+{
+	m_mesh->UpdateColor(color, m_context);
 }
 
 inline float GeometricObject::DistanceIJ(GeometricObject* const& obj_i, GeometricObject* const& obj_j)

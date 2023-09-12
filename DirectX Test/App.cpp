@@ -57,8 +57,8 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
         InteractionModel interactionModel = InteractionModel::MeshBased;
 
         m_main->Logic()->SetInteractionModel(interactionModel);
-        m_main->Logic()->IsRealTime(false);
-        m_main->Logic()->DT(pow(10, -3));
+        m_main->Logic()->IsRealTime(true);
+        m_main->Logic()->DT(pow(10, -2));
 
         if (m_main->Logic()->IsRealTime())
         {

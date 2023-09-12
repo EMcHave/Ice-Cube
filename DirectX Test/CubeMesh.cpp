@@ -94,9 +94,9 @@ CubeMesh::CubeMesh(_In_opt_ bool isLine, _In_ winrt::com_ptr<ID3D11Device3> cons
 
     //ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
     vertexBufferDesc.ByteWidth = sizeof(PNTVertex) * m_vertexCount;
-    vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+    vertexBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
     vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    vertexBufferDesc.CPUAccessFlags = 0;
+    vertexBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
     vertexBufferData.pSysMem = cubeVertices;
     vertexBufferData.SysMemPitch = 0;
@@ -131,4 +131,46 @@ CubeMesh::CubeMesh(_In_opt_ bool isLine, _In_ winrt::com_ptr<ID3D11Device3> cons
             m_indexBuffer.put()
         )
     );
+}
+
+void CubeMesh::UpdateColor(float4 color, _In_ ID3D11DeviceContext* context)
+{
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+    PNTVertex cubeVertices[] =
+    {
+        { float3(-0.5f, 0.5f, -0.5f), float3(0.0f, 1.0f, 0.0f), color }, // +Y (top face)
+        { float3(0.5f, 0.5f, -0.5f), float3(0.0f, 1.0f, 0.0f), color },
+        { float3(0.5f, 0.5f,  0.5f), float3(0.0f, 1.0f, 0.0f), color },
+        { float3(-0.5f, 0.5f,  0.5f), float3(0.0f, 1.0f, 0.0f), color },
+
+        { float3(-0.5f, -0.5f,  0.5f), float3(0.0f, -1.0f, 0.0f), color }, // -Y (bottom face)
+        { float3(0.5f, -0.5f,  0.5f), float3(0.0f, -1.0f, 0.0f), color },
+        { float3(0.5f, -0.5f, -0.5f), float3(0.0f, -1.0f, 0.0f), color },
+        { float3(-0.5f, -0.5f, -0.5f), float3(0.0f, -1.0f, 0.0f), color },
+
+        { float3(0.5f,  0.5f,  0.5f), float3(1.0f, 0.0f, 0.0f), color }, // +X (right face)
+        { float3(0.5f,  0.5f, -0.5f), float3(1.0f, 0.0f, 0.0f), color },
+        { float3(0.5f, -0.5f, -0.5f), float3(1.0f, 0.0f, 0.0f), color },
+        { float3(0.5f, -0.5f,  0.5f), float3(1.0f, 0.0f, 0.0f), color },
+
+        { float3(-0.5f,  0.5f, -0.5f), float3(-1.0f, 0.0f, 0.0f), color }, // -X (left face)
+        { float3(-0.5f,  0.5f,  0.5f), float3(-1.0f, 0.0f, 0.0f), color },
+        { float3(-0.5f, -0.5f,  0.5f), float3(-1.0f, 0.0f, 0.0f), color },
+        { float3(-0.5f, -0.5f, -0.5f), float3(-1.0f, 0.0f, 0.0f), color },
+
+        { float3(-0.5f,  0.5f, 0.5f), float3(0.0f, 0.0f, 1.0f), color }, // +Z (front face)
+        { float3(0.5f,  0.5f, 0.5f), float3(0.0f, 0.0f, 1.0f), color },
+        { float3(0.5f, -0.5f, 0.5f), float3(0.0f, 0.0f, 1.0f), color },
+        { float3(-0.5f, -0.5f, 0.5f), float3(0.0f, 0.0f, 1.0f), color },
+
+        { float3(0.5f,  0.5f, -0.5f), float3(0.0f, 0.0f, -1.0f), color }, // -Z (back face)
+        { float3(-0.5f,  0.5f, -0.5f), float3(0.0f, 0.0f, -1.0f), color },
+        { float3(-0.5f, -0.5f, -0.5f), float3(0.0f, 0.0f, -1.0f), color },
+        { float3(0.5f, -0.5f, -0.5f), float3(0.0f, 0.0f, -1.0f), color },
+    };
+
+    context->Map(m_vertexBuffer.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    memcpy(mappedResource.pData, cubeVertices, sizeof(cubeVertices));
+    context->Unmap(m_vertexBuffer.get(), 0);
 }

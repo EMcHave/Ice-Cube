@@ -103,5 +103,6 @@ void Cube::UnRegisterConnection(Connection* con)
             return el == con;
         });
     m_connections.erase(rmv, m_connections.end());
+    UpdateColor(winrt::Windows::Foundation::Numerics::float4(1, 1, 0, 1));
 }
 
