@@ -111,7 +111,7 @@ void MyRenderer::CreateDeviceDependentResources(_In_ std::shared_ptr<LogicClass>
     //auto cubeMesh = std::make_shared<CubeMesh>(false, d3dDevice);
     
     for (auto&& object : m_objects)
-        object->Mesh(std::make_shared<CubeMesh>(false, d3dDevice));
+        object->Mesh(std::make_shared<CubeMesh>(false, d3dDevice, object->Color()));
 
     m_lines.at(0)->Mesh(std::make_shared<LineMesh>(true, Axis::X, d3dDevice));
     m_lines.at(1)->Mesh(std::make_shared<LineMesh>(true, Axis::Y, d3dDevice));
@@ -230,8 +230,8 @@ void MyRenderer::Render()
     
     for (auto&& object : m_objects)
         object->Render(m_d3dDeviceContext, m_constantBufferChangesEveryPrim.get());
-    for (auto&& object : m_lines)
-        object->Render(m_d3dDeviceContext, m_constantBufferChangesEveryPrim.get());
+    /*for (auto&& object : m_lines)
+        object->Render(m_d3dDeviceContext, m_constantBufferChangesEveryPrim.get());*/
     //for (int i = 3; i < m_lines.size(); i++)
         //m_lines[i]->Render(m_d3dDeviceContext, m_constantBufferChangesEveryPrim.get());
 }

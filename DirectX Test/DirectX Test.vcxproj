@@ -6,7 +6,7 @@
     <CppWinRTRootNamespaceAutoMerge>true</CppWinRTRootNamespaceAutoMerge>
     <MinimalCoreWin>true</MinimalCoreWin>
     <ProjectGuid>{89040dfa-4ac9-40ec-af9e-76c796acbce7}</ProjectGuid>
-    <ProjectName>DirectX Test</ProjectName>
+    <ProjectName>Ice Cube</ProjectName>
     <RootNamespace>DirectX_Test</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
@@ -116,6 +116,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Block.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Common\BasicLoader.h" />
     <ClInclude Include="Common\BasicMath.h" />
@@ -130,6 +131,7 @@
     <ClInclude Include="ConstantBuffers.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="CubeMesh.h" />
+    <ClInclude Include="Cylinder.h" />
     <ClInclude Include="DirectXMath.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="GameClass.h" />
@@ -160,6 +162,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="Block.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Common\BasicLoader.cpp" />
     <ClCompile Include="Common\BasicReaderWriter.cpp" />
@@ -169,6 +172,7 @@
     <ClCompile Include="Connection.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="CubeMesh.cpp" />
+    <ClCompile Include="Cylinder.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="GameClass.cpp" />
     <ClCompile Include="GeometricObject.cpp" />

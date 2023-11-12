@@ -54,6 +54,8 @@
     <ClCompile Include="Mesh.cpp">
       <Filter>Base</Filter>
     </ClCompile>
+    <ClCompile Include="Block.cpp" />
+    <ClCompile Include="Cylinder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -129,6 +131,8 @@
     <ClInclude Include="Mesh.h">
       <Filter>Base</Filter>
     </ClInclude>
+    <ClInclude Include="Block.h" />
+    <ClInclude Include="Cylinder.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\SplashScreen.scale-200.png">

@@ -1,9 +1,8 @@
 #include <d3d11_2.h>
+#include <iostream>
+#include <fstream>
+#include <string>
 #include "pch.h"
-#include "Common/DirectXSample.h"
-#include "Common/DeviceResources.h"
-#include "Common/BasicLoader.h"
-#include "Common/BasicReaderWriter.h"
 #include "GameClass.h"
 
 
@@ -49,7 +48,7 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
     }
 
 
-    void Run()
+    winrt::Windows::Foundation::IAsyncAction Run()
     {   
         m_main->CreateDeviceDependentResources();
         m_main->CreateWindowSizeDependentResources();
@@ -59,7 +58,10 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
         m_main->Logic()->SetInteractionModel(interactionModel);
         m_main->Logic()->IsRealTime(true);
         m_main->Logic()->DT(pow(10, -2));
+        auto localFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
+        std::string path = winrt::to_string(localFolder.Path());
 
+        
         if (m_main->Logic()->IsRealTime())
         {
             while (true)
@@ -78,10 +80,35 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
          
             int dt = N / (time * 60);
 
-            //m_window.get().Dispatcher().ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
+            std::ofstream integralForceFile;
+            std::ofstream forceDiagramFile1, forceDiagramFile2, forceDiagramFile3;
+            integralForceFile.open(path + "\\int_force.txt");
+            forceDiagramFile1.open(path + "\\force_diagram1.csv");
+            forceDiagramFile2.open(path + "\\force_diagram2.csv");
+            forceDiagramFile3.open(path + "\\force_diagram3.csv");
+
+            forceDiagramFile1 << "Number,X,Y,Z,Fx,Fy,Fz" << std::endl;
+            forceDiagramFile2 << "Number,X,Y,Z,Fx,Fy,Fz" << std::endl;
+            forceDiagramFile3 << "Number,X,Y,Z,Fx,Fy,Fz" << std::endl;
+
             int begin = GetTickCount64();
             for (int n = 0; n < N; n++)
+            {
                 m_main->Logic()->TimeStep();
+                m_main->Logic()->WriteForceToFile(integralForceFile);
+                if (n == static_cast<int>(N / 3))
+                    m_main->Logic()->WriteDiagramToFile(forceDiagramFile1);
+                else if (n == N / 2)
+                    m_main->Logic()->WriteDiagramToFile(forceDiagramFile2);
+                else if (n == static_cast<int>(N * 3 / 4))
+                    m_main->Logic()->WriteDiagramToFile(forceDiagramFile3);
+            }
+            
+            integralForceFile.close();
+            forceDiagramFile1.close();
+            forceDiagramFile2.close();
+            forceDiagramFile3.close();
+
             elapsedTime = GetTickCount64() - begin;
             
             while (true)
@@ -95,6 +122,7 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
                 }
             }
         }
+        
     }
 
 

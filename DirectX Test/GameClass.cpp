@@ -44,11 +44,13 @@ void GameClass::Update(int i)
 				m_controller->Position(),
 				m_controller->Orientation(),
 				DirectX::XMFLOAT3(0, 1, 0)
-			);		
+			);
+
 			if (m_logic->IsRealTime())
 				m_logic->TimeStep();
 			else
 				m_logic->AnimationStep(i);
+			
 		});
 }
 

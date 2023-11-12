@@ -1,12 +1,8 @@
 #pragma once
 
 #include <memory>
-#include "Common/DirectXSample.h"
-#include "Common/DeviceResources.h"
 #include "Common/StepTimer.h"
 #include "LogicClass.h"
-#include "MoveLookController.h"
-#include "Camera.h"
 #include "MyRenderer.h"
 #include "Common/StepTimer.h"
 

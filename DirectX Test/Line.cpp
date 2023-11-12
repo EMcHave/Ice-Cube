@@ -65,6 +65,7 @@ void Line::Init()
 			&m_modelMatrix,
 			DirectX::XMMatrixRotationY(3.1415 / 2) * DirectX::XMMatrixTranslation(0, 0, 0.5)
 		);
+		break;
 	case W:
 	{
 		uint32_t equal;

@@ -3,15 +3,6 @@
 #include "Connection.h"
 #include <random>
 
-enum EntityType
-{
-	PlaneTriangle,
-	PlaneQuad,
-	SolidQuad,
-	Cylinder,
-	Sphere
-};
-
 enum Behavior
 {
 	Flexible, 
@@ -35,34 +26,31 @@ struct Material
 class Entity
 {
 public:
-	const float criticalDeformation = 0.05;
+	const float criticalDeformationPercent = 5;
 	Entity();
 	Entity(
-		DirectX::XMFLOAT4 size,
+		DirectX::XMFLOAT4 color,
 		InitialConditions initialConditions,
 		Material material,
-		EntityType type, 
 		Behavior behavior);
+	virtual ~Entity(){}
 	void SetInitialConditions(DirectX::XMFLOAT3 velocity);
-	float V() { return m_size.w * (m_size.x - 1) * (m_size.y - 1) * (m_size.z - 1); }
 
 	const std::vector<std::shared_ptr<Cube>>& Particles() { return m_particles; }
 	std::vector<std::shared_ptr<Cube>>& ContactParticles() { return m_contactParticles; }
 	std::vector<std::shared_ptr<Cube>>& BrokenParticles() { return m_brokenParticles; }
-	std::vector<std::shared_ptr<Connection>>& Connections() { return m_connections; }
-	const std::shared_ptr<Cube> Particle(int i, int j, int k) 
-	{ return m_particles.at(k * m_size.x * m_size.y + j * m_size.x + i); }
-
-	void CreateOrthogonalMesh();
-	void CreateTriangularMesh1D();
-	void CreateCylinderMesh(float coneAngle);
-
-	void RigidRotate(XMVECTOR, float);
-
-	bool static CheckIfConnectionExists(Cube* p1, Cube* p2);
-	bool CheckBreak(float dist, std::shared_ptr<Connection> c);
+	inline std::vector<std::shared_ptr<Connection>>& Connections() { return m_connections; }
 
 	DirectX::XMFLOAT4 Size() { return m_size; }
+	virtual const std::shared_ptr<Cube> Particle(int i, int j, int k) = 0;
+
+
+	void CreateCylinderMesh(float coneAngle);
+
+	void RigidRotate(XMVECTOR);
+
+	bool static CheckIfConnectionExists(Cube* p1, Cube* p2);
+
 	Behavior GetBehavior() { return m_behavior; }
 
 	static float LennardJones(float r, float A, float D)
@@ -99,18 +87,18 @@ public:
 		//return G * Jp / a;
 		return 1;
 	}
-private:
+protected:
+	virtual void CreateConnections() = 0;
 	std::vector<std::shared_ptr<Connection>>	m_connections;
 	std::vector<std::shared_ptr<Cube>>			m_particles;
 	std::vector<std::shared_ptr<Cube>>			m_contactParticles;
 	std::vector<std::shared_ptr<Cube>>			m_brokenParticles;
 
-
-
 	DirectX::XMFLOAT4							m_size;
 	DirectX::XMFLOAT3							m_position;
+	DirectX::XMFLOAT3							m_velocity;
+	DirectX::XMFLOAT4							m_color;
 
-	EntityType									m_entityType;
 	Material									m_material;
 	Behavior									m_behavior;
 };

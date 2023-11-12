@@ -5,7 +5,7 @@
 using namespace DirectX;
 using namespace winrt::Windows::Foundation::Numerics;
 
-CubeMesh::CubeMesh(_In_opt_ bool isLine, _In_ winrt::com_ptr<ID3D11Device3> const& device) : MeshObject(_In_opt_ isLine)
+CubeMesh::CubeMesh(_In_opt_ bool isLine, _In_ winrt::com_ptr<ID3D11Device3> const& device, DirectX::XMFLOAT4 col) : MeshObject(_In_opt_ isLine)
 {
     const D3D11_INPUT_ELEMENT_DESC PNTVertexLayout[] =
     {
@@ -29,8 +29,11 @@ CubeMesh::CubeMesh(_In_opt_ bool isLine, _In_ winrt::com_ptr<ID3D11Device3> cons
     };
     */
 
-    const float4 color = float4(0.53f, 0.81f, 0.94f, 0.0f);
-    
+    float4 color;
+    color.w = col.w;
+    color.x = col.x;
+    color.y = col.y;
+    color.z = col.z;
 
     PNTVertex cubeVertices[] =
     {

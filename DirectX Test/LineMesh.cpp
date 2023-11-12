@@ -16,13 +16,16 @@ LineMesh::LineMesh(bool isLine, Axis axis, winrt::com_ptr<ID3D11Device3> const& 
     switch (axis)
     {
     case X:
-        color = float4(1.f, 0.f, 0.f, 1.f);
+        color = float4(0.f, 1.f, 0.f, 1.f);
+        //color = float4(1.f, 0.f, 0.f, 1.f);
         break;
     case Y:
-        color = float4(0.f, 1.f, 0.f, 1.f);
+        color = float4(0.f, 0.f, 1.f, 1.f);
+        //color = float4(0.f, 1.f, 0.f, 1.f);
         break;
     case Z:
-        color = float4(0.f, 0.f, 1.f, 1.f);
+        color = float4(1.f, 0.f, 0.f, 1.f);
+        //color = float4(0.f, 0.f, 1.f, 1.f);
         break;
     case W:
         color = float4(1.f, 1.f, 1.f, 1.f);

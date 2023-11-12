@@ -16,7 +16,8 @@ Cube::Cube()
     Update();
 }
 
-Cube::Cube(XMFLOAT3 position, float radius, float scale, bool isFixed)
+Cube::Cube(XMFLOAT3 position, XMFLOAT4 color,
+           float radius, float scale, bool isFixed)
 {
     m_numberOfConnections = 0;
     m_scale = scale;
@@ -27,10 +28,12 @@ Cube::Cube(XMFLOAT3 position, float radius, float scale, bool isFixed)
     m_moment = XMVectorZero();
     m_initialMatrix = XMMatrixIdentity();
     m_isContact = false;
+    m_color = color;
     Update();
 }
 
-Cube::Cube(DirectX::XMFLOAT3 position, XMVECTOR quat, float radius, float scale, bool isFixed)
+Cube::Cube(DirectX::XMFLOAT3 position, XMVECTOR quat, XMFLOAT4 color,
+           float radius, float scale, bool isFixed)
 {
     m_numberOfConnections = 0;
     m_scale = scale;
@@ -42,6 +45,7 @@ Cube::Cube(DirectX::XMFLOAT3 position, XMVECTOR quat, float radius, float scale,
     m_moment = XMVectorZero();
     m_initialMatrix = XMMatrixIdentity();
     m_isContact = false;
+    m_color = color;
     Update();
 }
 
@@ -103,6 +107,6 @@ void Cube::UnRegisterConnection(Connection* con)
             return el == con;
         });
     m_connections.erase(rmv, m_connections.end());
-    UpdateColor(winrt::Windows::Foundation::Numerics::float4(1, 1, 0, 1));
+    //UpdateColor(winrt::Windows::Foundation::Numerics::float4(1, 1, 0, 1));
 }
 

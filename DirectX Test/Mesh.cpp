@@ -36,7 +36,7 @@ std::shared_ptr<Ice::Cell> Ice::Mesh::CellByPosition(DirectX::XMFLOAT3 pos)
 
 std::shared_ptr<Ice::Cell> Ice::Mesh::Cel(int i, int j, int k)
 {
-	return cells[NX * NZ * j + NZ * i + k];
+	return cells.at(NX * NZ * j + NZ * i + k);
 }
 
 Ice::Cell::Cell(int i, int j, int k, float r, DirectX::XMFLOAT3 sdvig)
@@ -57,7 +57,8 @@ Ice::Cell::Cell(int i, int j, int k, float r, DirectX::XMFLOAT3 sdvig)
 void Ice::Cell::AddParticle(GeometricObject* p)
 {
 	particles.push_back(p);
-	isEmpty = false;
+	if(isEmpty)
+		isEmpty = false;
 }
 
 void Ice::Cell::Clear()

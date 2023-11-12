@@ -17,10 +17,11 @@
     <Resource Language="x-generate" />
   </Resources>
   <Applications>
-    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="DirectX_Test.App">
-      <uap:VisualElements DisplayName="DirectX Test" Description="A project for a C++/WinRT Universal Windows Platform (UWP) app directly implementing CoreApplication"
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Ice_Cube.App">
+      <uap:VisualElements DisplayName="Ice Cube" Description="A project for a C++/WinRT Universal Windows Platform (UWP) app directly implementing CoreApplication"
         Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" BackgroundColor="transparent">
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
+        <uap:DefaultTile/>
       </uap:VisualElements>
     </Application>
   </Applications>

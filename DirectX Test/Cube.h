@@ -1,4 +1,5 @@
 #pragma once
+#include <mutex>
 #include "GeometricObject.h"
 
 using namespace DirectX;
@@ -7,8 +8,8 @@ class Cube : public GeometricObject
 {
 public:
 	Cube();
-	Cube(DirectX::XMFLOAT3 pos, float, float, bool);
-	Cube(DirectX::XMFLOAT3 pos, DirectX::XMVECTOR quat, float, float, bool);
+	Cube(DirectX::XMFLOAT3 pos, XMFLOAT4 color, float, float, bool);
+	Cube(DirectX::XMFLOAT3 pos, DirectX::XMVECTOR quat, XMFLOAT4 color, float, float, bool);
 
 	void SetInitialQuaternion(XMVECTOR);
 
@@ -47,13 +48,14 @@ public:
 		m_orientations.push_back(quat);
 	}
 
+	std::mutex								m_mutex;
 	std::vector<XMVECTOR>					m_positions;
 	std::vector<XMVECTOR>					m_orientations;
 private:
 	void Update();
 	
 
-
+	
 	DirectX::XMVECTOR								m_force;
 	DirectX::XMVECTOR								m_moment;
 	uint32_t										m_numberOfConnections;

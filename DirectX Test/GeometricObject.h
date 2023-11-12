@@ -13,6 +13,7 @@ class GeometricObject
 {
 public:
 	GeometricObject();
+	virtual ~GeometricObject(){}
 
 	void Render(
 		_In_ ID3D11DeviceContext* context,
@@ -32,6 +33,7 @@ public:
 	void Quaternion(DirectX::XMFLOAT4 quaternion);
 	void Quaternion(DirectX::XMVECTOR quaternion);
 	void QuaternionHalf(DirectX::XMVECTOR quaternion);
+	void Color(DirectX::XMFLOAT4 color);
 	DirectX::XMMATRIX ModelMatrix();
 	DirectX::XMFLOAT3 Position();
 	DirectX::XMFLOAT3 Velocity();
@@ -44,6 +46,8 @@ public:
 	DirectX::XMVECTOR KineticMoment();
 	DirectX::XMVECTOR VectorQuaternion();
 	DirectX::XMVECTOR VectorQuaternionHalf();
+	DirectX::XMFLOAT4 Color();
+
 
 	std::shared_ptr<Ice::Cell> Cell() { return m_cell; }
 	void Cell(std::shared_ptr<Ice::Cell> cell) { m_cell = cell; }
@@ -63,7 +67,7 @@ protected:
 	DirectX::XMFLOAT3						m_kineticMoment;
 	DirectX::XMFLOAT4						m_quaternion;
 	DirectX::XMFLOAT4						m_quaternionHalf;
-	
+	DirectX::XMFLOAT4						m_color;
 	std::shared_ptr<Ice::Cell>				m_cell;
 
 	ID3D11DeviceContext*					m_context;
@@ -150,6 +154,11 @@ inline void GeometricObject::QuaternionHalf(DirectX::XMVECTOR quaternion)
 	XMStoreFloat4(&m_quaternionHalf, quaternion);
 }
 
+inline void GeometricObject::Color(DirectX::XMFLOAT4 color)
+{
+	m_color = color;
+}
+
 __forceinline DirectX::XMFLOAT3 GeometricObject::Velocity()
 {
 	return m_velocity;
@@ -188,6 +197,11 @@ inline DirectX::XMVECTOR GeometricObject::VectorQuaternion()
 inline DirectX::XMVECTOR GeometricObject::VectorQuaternionHalf()
 {
 	return XMLoadFloat4(&m_quaternionHalf);
+}
+
+inline DirectX::XMFLOAT4 GeometricObject::Color()
+{
+	return m_color;
 }
 
 inline void GeometricObject::UpdateColor(winrt::Windows::Foundation::Numerics::float4 color)
