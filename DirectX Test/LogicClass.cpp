@@ -22,6 +22,7 @@ void LogicClass::Init(
 	m_threads.reserve(8);
 	m_asyncThreads.reserve(8);
 
+
 	E = 2 * pow(10, 4);
 	G = 2 * pow(10, 2);
 	nu = 0.3;
