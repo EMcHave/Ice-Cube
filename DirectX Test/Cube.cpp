@@ -11,21 +11,22 @@ Cube::Cube()
     m_position = XMFLOAT3(0.0f, 0.0f, 0.0f);
     m_force = XMVectorZero();
     m_moment = XMVectorZero();
+    m_frictionalForce = XMVectorZero();
     m_numberOfConnections = 0;
     m_isContact = false;
     Update();
 }
 
 Cube::Cube(XMFLOAT3 position, XMFLOAT4 color,
-           float radius, float scale, bool isFixed)
+           float radius, float scale)
 {
     m_numberOfConnections = 0;
     m_scale = scale;
-    m_isFixed = isFixed;
     m_position = position;
     m_radius = radius;
     m_force = XMVectorZero();
     m_moment = XMVectorZero();
+    m_frictionalForce = XMVectorZero();
     m_initialMatrix = XMMatrixIdentity();
     m_isContact = false;
     m_color = color;
@@ -33,16 +34,16 @@ Cube::Cube(XMFLOAT3 position, XMFLOAT4 color,
 }
 
 Cube::Cube(DirectX::XMFLOAT3 position, XMVECTOR quat, XMFLOAT4 color,
-           float radius, float scale, bool isFixed)
+           float radius, float scale)
 {
     m_numberOfConnections = 0;
     m_scale = scale;
-    m_isFixed = isFixed;
     m_position = position;
     m_radius = radius;
     XMStoreFloat4(&m_quaternion, quat);
     m_force = XMVectorZero();
     m_moment = XMVectorZero();
+    m_frictionalForce = XMVectorZero();
     m_initialMatrix = XMMatrixIdentity();
     m_isContact = false;
     m_color = color;

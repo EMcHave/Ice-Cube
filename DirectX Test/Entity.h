@@ -42,12 +42,14 @@ public:
 	inline std::vector<std::shared_ptr<Connection>>& Connections() { return m_connections; }
 
 	DirectX::XMFLOAT4 Size() { return m_size; }
+	bool IsFixed() { return m_isFixed; }
 	virtual const std::shared_ptr<Cube> Particle(int i, int j, int k) = 0;
 
 
 	void CreateCylinderMesh(float coneAngle);
 
 	void RigidRotate(XMVECTOR);
+	void MakeFixed() { for (auto& p : m_particles) p->m_isFixed = true; m_isFixed = true; }
 
 	bool static CheckIfConnectionExists(Cube* p1, Cube* p2);
 
@@ -57,7 +59,7 @@ public:
 	{
 
 		if (r > A)
-			return 0;
+			return 0;  
 		else if (r <= A && r >= 0.9 * A)
 			return 12 * D / A * (pow(A / r, 7) - pow(A / r, 13));
 		else
@@ -101,5 +103,6 @@ protected:
 
 	Material									m_material;
 	Behavior									m_behavior;
+	bool										m_isFixed;
 };
 

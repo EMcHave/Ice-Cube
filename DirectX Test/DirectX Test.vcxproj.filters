@@ -27,12 +27,6 @@
     <ClCompile Include="MeshObject.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
-    <ClCompile Include="GeometricObject.cpp">
-      <Filter>Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="Cube.cpp">
-      <Filter>Resources</Filter>
-    </ClCompile>
     <ClCompile Include="CubeMesh.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
@@ -46,16 +40,33 @@
     <ClCompile Include="LineMesh.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
-    <ClCompile Include="Line.cpp">
-      <Filter>Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="Connection.cpp" />
-    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Mesh.cpp">
       <Filter>Base</Filter>
     </ClCompile>
-    <ClCompile Include="Block.cpp" />
-    <ClCompile Include="Cylinder.cpp" />
+    <ClCompile Include="Cube.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometricObject.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Line.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Cylinder.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Block.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Connection.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="SphereMesh.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -95,12 +106,6 @@
     <ClInclude Include="MeshObject.h">
       <Filter>Resources</Filter>
     </ClInclude>
-    <ClInclude Include="GeometricObject.h">
-      <Filter>Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="Cube.h">
-      <Filter>Resources</Filter>
-    </ClInclude>
     <ClInclude Include="CubeMesh.h">
       <Filter>Resources</Filter>
     </ClInclude>
@@ -120,19 +125,36 @@
     <ClInclude Include="LineMesh.h">
       <Filter>Resources</Filter>
     </ClInclude>
-    <ClInclude Include="Line.h">
-      <Filter>Resources</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Sources</Filter>
     </ClInclude>
-    <ClInclude Include="Connection.h" />
-    <ClInclude Include="Entity.h" />
     <ClInclude Include="Mesh.h">
       <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="Block.h" />
-    <ClInclude Include="Cylinder.h" />
+    <ClInclude Include="Cube.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometricObject.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Line.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Cylinder.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Block.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Connection.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="SphereMesh.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\SplashScreen.scale-200.png">
@@ -192,6 +214,12 @@
     </Filter>
     <Filter Include="Project Properties">
       <UniqueIdentifier>{ef7c95ba-3a89-4c89-b504-41f13556ff8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects">
+      <UniqueIdentifier>{44cae956-0852-4194-902d-ba067a25c33c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Entities">
+      <UniqueIdentifier>{beb17c6e-eaf6-43a2-8c53-13b2f96364b0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

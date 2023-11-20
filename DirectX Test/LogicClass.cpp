@@ -21,14 +21,14 @@ void LogicClass::Init(
 	m_gravity = XMFLOAT3(0, -1, 0);
 	m_threads.reserve(8);
 	m_asyncThreads.reserve(8);
-
+	m_frictionEnabled = true;
 
 	E = 2 * pow(10, 4);
 	G = 2 * pow(10, 2);
 	nu = 0.3;
 	float rho = 900;
 	float M = 1000;
-	m = 5;
+	m = 10;
 	
 	J = 1;
 	Jp = 5 * pow(10, -10);
@@ -50,15 +50,17 @@ void LogicClass::Init(
 	float a1 = iceLength / NX;
 	float a2 = 2 * XM_PI * cylinderRadius / cylinderNumberOfParticles;
 
-	InitialConditions initCond1 { XMFLOAT3(0.1, 0, 2), XMFLOAT3(0.01, 0, 0) };
-	InitialConditions initCond2 { XMFLOAT3(1.05, -0.5, 0), XMFLOAT3(0, 0, 0) };
+	InitialConditions initCond1 { XMFLOAT3(-2, -0.3+a1, 2), XMFLOAT3(0, 0, 0)};
+	InitialConditions initCond2 { XMFLOAT3(1.2, -0.5, 0), XMFLOAT3(0, 0, 0) };
 	InitialConditions initCond3 { XMFLOAT3(0.175, -0.1, 2.5), XMFLOAT3(0, 0, 0) };
+	InitialConditions initCond4 { XMFLOAT3(-2, -0.3, 2), XMFLOAT3(0.0, 0.0, 0.0) };
 	Material mat{ E, G, nu, rho };
 	
 	XMFLOAT3 ny(0, 1, 0);
 	XMFLOAT3 nz(0, 0, 1);
+
 	XMVECTOR quat1 = XMQuaternionRotationNormal(XMLoadFloat3(&ny), XM_PIDIV2);
-	XMVECTOR quat2 = XMQuaternionRotationNormal(XMLoadFloat3(&nz), XM_PI / 2);
+	XMVECTOR quat2 = XMQuaternionRotationNormal(XMLoadFloat3(&nz), XM_PI / 6);
 	XMFLOAT4 f_totalQuat1;
 	XMFLOAT4 f_totalQuat2;
 	//XMStoreFloat4(&f_totalQuat, XMQuaternionMultiply(quat2, quat1));
@@ -71,9 +73,9 @@ void LogicClass::Init(
 		XMFLOAT4(0.53f, 0.81f, 0.94f, 0.0f),
 		initCond1,
 		mat,
-		Behavior::Flexible,
-		XMFLOAT4(iceLength, iceWidth, a1, a1),
-		f_totalQuat1
+		Behavior::Rigid,
+		XMFLOAT4(iceLength / 2, iceWidth / 2, a1, a1),
+		f_totalQuat2
 	);
 	
 	auto entity2 = std::make_shared<Cylinder>(
@@ -82,8 +84,9 @@ void LogicClass::Init(
 		mat,
 		Behavior::Rigid,
 		XMFLOAT4(cylinderRadius, 0, cylinderHeight, a2),
-		60
+		0
 	);
+	entity2->MakeFixed();
 
 	auto entity3 = std::make_shared<Block>(
 		XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f),
@@ -93,12 +96,24 @@ void LogicClass::Init(
 		XMFLOAT4(1, 5, a1, a1),
 		f_totalQuat2
 	);
+	entity3->MakeFixed();
+
+	auto entity4 = std::make_shared<Block>(
+		XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f),
+		initCond4,
+		mat,
+		Behavior::Rigid,
+		XMFLOAT4(iceLength, iceWidth, a1, a1),
+		f_totalQuat2
+	);
+	entity4->MakeFixed();
 
 	m_entities.push_back(entity1);
 	//m_entities.push_back(entity2);
-	m_entities.push_back(entity3);
+	//m_entities.push_back(entity3);
+	m_entities.push_back(entity4);
 
-	const XMFLOAT3 meshSize(5, 2, 5);
+	const XMFLOAT3 meshSize(5, 4, 5);
 	const float cellSize = max(m_entities[0]->Size().w, m_entities[1]->Size().w);
 	//const float cellSize = m_entities[0]->Size().w;
 	m_mesh = Ice::Mesh(meshSize, 2 * cellSize);
@@ -127,18 +142,16 @@ void LogicClass::TimeStep()
 			if (cell.get() != nullptr)
 				cell->AddParticle(p.get());
 		}
-		
-		//ALLCELLS(i, j, k)
-			//EvaluateMeshBasedInteraction(i, j, k);
 
 		ParallelMeshBasedInteraction();
+		for (auto& p : m_particles)
+			p->Force() += p->FricForce();
 	}
 
 
 
 	for (auto& entity : m_entities)
 	{
-		//auto entity = m_entities[e];
 		bool is_flexible = entity->GetBehavior() == Behavior::Flexible;
 
 		for (auto it = entity->Connections().begin(); it != entity->Connections().end(); )
@@ -174,20 +187,22 @@ void LogicClass::TimeStep()
 
 		}
 
-		if (entity->GetBehavior() != Behavior::Rigid)
-			EvaluateArcForce(entity);
+		//if (!entity->IsFixed())
+			//EvaluateArcForce(entity);
 
 		for (auto& particle : entity->Particles())
 		{
-			if (entity->GetBehavior() != Behavior::Rigid)
+			if (!entity->IsFixed())
 				particle->Force() += XMLoadFloat3(&m_gravity);
 
+			/*
 			if (particle->Position().y > 0)
 				vis = 0;
 			else
 				vis = 0;
+			*/
+			vis = 0;
 
-			XMFLOAT3 constraint(1, 1, 1);
 			if (m_isFirstTimeStep)
 			{
 				particle->Velocity(particle->VectorVelocity() + 0.5 * dt * particle->Force() / m);
@@ -201,11 +216,7 @@ void LogicClass::TimeStep()
 				particle->AddTimePoint(particle->VectorPosition(), particle->VectorQuaternion());
 		}
 		
-
-
-		//for (auto& connection : entity->Connections())
-			//connection->Update();
-		std::for_each(std::execution::par_unseq,
+		std::for_each(std::execution::par,
 			entity->Connections().begin(),
 			entity->Connections().end(),
 			[](std::shared_ptr<Connection>& c) {c->Update(); });
@@ -338,7 +349,7 @@ void LogicClass::RotationalIntegratorSymplectic(const std::shared_ptr<Cube> part
 	XMVECTOR av_half_plus = particle->VectorAngularVelocity() * (!particle->m_isFixed) * !m_isFirstTimeStep + dt * particle->Moment() / J;
 	XMStoreFloat3(&m_tempAngularVelocity3, av_half_plus);
 	m_tempAngularVelocity4 = XMFLOAT4(m_tempAngularVelocity3.x, m_tempAngularVelocity3.y, m_tempAngularVelocity3.z, 0.f);
-	XMVECTOR q_new = particle->VectorQuaternion() + 0.5 * dt * XMQuaternionMultiply(q_half_plus, XMLoadFloat4(&m_tempAngularVelocity4));
+	XMVECTOR q_new = particle->VectorQuaternion() + 0.5 * (0.5 * dt) * XMQuaternionMultiply(q_half_plus, XMLoadFloat4(&m_tempAngularVelocity4));
 
 	particle->AngularVelocity(av_half_plus);
 	particle->Quaternion(q_new / XMQuaternionLength(q_new));
@@ -391,7 +402,7 @@ void LogicClass::EvaluateInteractionBetweenEntities(int e)
 			for (auto another_particle : another_entity->ContactParticles())
 			{
 				float r = GeometricObject::DistanceIJ(particle.get(), another_particle.get());
-				float f = Entity::LennardJones(r, particle->R() + another_particle->R(), 0.1);
+				float f = Entity::LennardJones(r, particle->R() + another_particle->R(), 0.05);
 				DirectX::XMVECTOR e_ij = (another_particle->VectorPosition() - particle->VectorPosition()) / r;
 				particle->Force() += f * e_ij;
 				another_particle->Force() -= f * e_ij;
@@ -438,9 +449,21 @@ void LogicClass::EvaluateMeshBasedInteraction(int i, int j, int k)
 				if (p1 != p2 && !Entity::CheckIfConnectionExists(p1, p2))
 				{
 					float r = GeometricObject::DistanceIJ(p1, p2);
-					float f = Entity::LennardJones(r, p1->R() + p2->R(), 0.1);
-					DirectX::XMVECTOR e_ij = (p2->VectorPosition() - p1->VectorPosition()) / r;
+					float f = Entity::LennardJones(r, p1->R() + p2->R(), 1);
+					XMVECTOR e_ij = (p2->VectorPosition() - p1->VectorPosition()) / r;
 					p1->Force() += f * e_ij;
+					if (m_frictionEnabled)
+					{
+						float velf;
+						auto v1_contact = p1->VectorVelocity() +
+							XMVector3Cross(p1->VectorAngularVelocity(), p1->R() * e_ij);
+						auto v2_contact = p2->VectorVelocity() -
+							XMVector3Cross(p2->VectorAngularVelocity(), p2->R() * e_ij);
+						XMVECTOR dv = v1_contact - v2_contact;
+						XMStoreFloat(&velf, XMVector3Length(dv));
+						if(velf != 0.0f)
+							p1->FricForce() += m_mu * f * std::erf(velf / 0.01) * (dv / velf);
+					}
 				}
 				
 			}
@@ -505,9 +528,27 @@ void LogicClass::EvaluateArcForce(const std::shared_ptr<Entity> entity)
 			}
 }
 
+void LogicClass::EvaluateFrictionForces(const std::shared_ptr<Cube> particle)
+{
+	for (auto& p : m_particles)
+	{
+
+	}
+}
+
 void LogicClass::CreateThread(float bl, float bw, float bh, float el, float ew, float eh)
 {
 	ALLCELLSUPD(i, j, k, bl, bw, bh, el, ew, eh)
 		EvaluateMeshBasedInteraction(i, j, k);
+}
+
+DirectX::XMMATRIX LogicClass::ProjectionMatrix(XMFLOAT3 n)
+{
+	XMFLOAT3X3 nn(
+		n.x * n.x, n.x * n.y, n.x * n.z,
+		n.y * n.x, n.y * n.y, n.y * n.z,
+		n.z * n.x, n.z * n.y, n.z * n.z
+	);
+	return XMMatrixIdentity() - XMLoadFloat3x3(&nn);
 }
 

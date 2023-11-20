@@ -35,7 +35,8 @@ Block::Block(
 	}
 	else
 	{
-		CreateOrthogonalMesh();
+		CreateTriangularMesh1D(XMLoadFloat4(&initOrientation));
+		//CreateOrthogonalMesh();
 		OrthogonalConnections();
 	}
 		
@@ -59,7 +60,7 @@ void Block::CreateOrthogonalMesh()
 			for (int i = 0; i < m_size.x; i++)
 			{
 				auto cube = std::make_shared<Cube>(
-					XMFLOAT3(i * m_size.w, k * m_size.w, -j * m_size.w), m_color, 0.5 * m_size.w, 0.9 * m_size.w, isFixed);
+					XMFLOAT3(i * m_size.w, k * m_size.w, -j * m_size.w), m_color, 0.5 * m_size.w, 0.9 * m_size.w);
 				m_particles.push_back(cube);
 			}
 
@@ -68,7 +69,8 @@ void Block::CreateOrthogonalMesh()
 
 void Block::CreateTriangularMesh1D(XMVECTOR initOrientation)
 {
-	bool isFixed = m_behavior == Behavior::Rigid;
+	float scale = m_size.w * 0.5;
+	float radius = 0.5 * m_size.w;
 	for (int j = 0; j < m_size.y; j++)
 		for (int i = 0; i < m_size.x; i++)
 		{
@@ -79,7 +81,7 @@ void Block::CreateTriangularMesh1D(XMVECTOR initOrientation)
 					XMFLOAT3(
 						i * m_size.w,
 						0,
-						-j * m_size.w * sinf(XM_PI / 3)), m_color, 0.5 * m_size.w, m_size.w * 0.9, isFixed);
+						-j * m_size.w * sinf(XM_PI / 3)), m_color, radius, scale);
 			}
 			else
 			{
@@ -87,7 +89,7 @@ void Block::CreateTriangularMesh1D(XMVECTOR initOrientation)
 					XMFLOAT3(
 						i * m_size.w + m_size.w * cosf(XM_PI / 3),
 						0,
-						-j * m_size.w * sinf(XM_PI / 3)), m_color, 0.5 * m_size.w, m_size.w * 0.9, isFixed);
+						-j * m_size.w * sinf(XM_PI / 3)), m_color, radius, scale);
 			}
 
 			m_particles.push_back(cube);

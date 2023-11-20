@@ -39,7 +39,6 @@ void Cylinder::CreateCylinderMesh(float coneAngle)
 	XMFLOAT3 n1(1, 0, 0);
 	XMFLOAT3 n2(0, 1, 0);
 	XMFLOAT3 n3(0, 0, 1);
-	bool isFixed = m_behavior == Behavior::Rigid;
 	for (int k = 0; k < m_size.z; k++)
 		for (int j = 0; j < m_size.y; j++)
 		{
@@ -47,7 +46,7 @@ void Cylinder::CreateCylinderMesh(float coneAngle)
 				XMFLOAT3(
 					(m_size.x - k * m_size.w * tanf(coneAngle)) * cosf(dfi * j) + m_position.x,
 					k * m_size.w + m_position.y,
-					(m_size.x - k * m_size.w * tanf(coneAngle)) * sinf(dfi * j) + m_position.z), m_color, 0.5 * m_size.w, m_size.w * 0.9, isFixed);
+					(m_size.x - k * m_size.w * tanf(coneAngle)) * sinf(dfi * j) + m_position.z), m_color, 0.5 * m_size.w, m_size.w * 0.9);
 			XMVECTOR quat = XMQuaternionRotationNormal(XMLoadFloat3(&n2), -j * dfi);
 			XMVECTOR n1_rotated = XMVector3Rotate(XMLoadFloat3(&n3), quat);
 			XMVECTOR quat2 = XMQuaternionRotationNormal(n1_rotated, coneAngle);

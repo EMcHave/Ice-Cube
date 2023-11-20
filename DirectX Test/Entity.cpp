@@ -17,6 +17,7 @@ Entity::Entity(
 	m_material = material;
 	m_behavior = behavior;
 	m_color = color;
+	m_isFixed = false;
 }
 
 void Entity::SetInitialConditions(DirectX::XMFLOAT3 velocity)

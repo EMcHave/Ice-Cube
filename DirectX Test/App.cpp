@@ -75,7 +75,7 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
         }
         else
         {
-            float time = 20;
+            float time = 10;
             int N = time / m_main->Logic()->DT();
          
             int dt = N / (time * 60);

@@ -54,15 +54,18 @@ private:
 	
 	void RotationalIntegratorSymplectic(const std::shared_ptr<Cube> particle);
 	void RotationalIntegratorNonSymplectic(const std::shared_ptr<Cube> particle);
-	void TranslationalIntegratorLeapFrog(const std::shared_ptr<Cube> particlew);
+	void TranslationalIntegratorLeapFrog(const std::shared_ptr<Cube> particle);
 	void EvaluateInteractionBetweenEntities(int e);
 	void EvaluateInteractionInEntity(
 		const std::shared_ptr<Entity> entity);
 	void EvaluateMeshBasedInteraction(int i, int j, int k);
 	void ParallelMeshBasedInteraction();
 	void EvaluateArcForce(const std::shared_ptr<Entity> entity);
+	void EvaluateFrictionForces(const std::shared_ptr<Cube> particle);
 
 	void CreateThread(float, float, float, float, float, float);
+
+	DirectX::XMMATRIX ProjectionMatrix(XMFLOAT3 n);
 
 	InteractionModel								m_interactionModel;
 
@@ -80,8 +83,11 @@ private:
 	XMFLOAT4										m_tempAngularVelocity4;
 	XMFLOAT3										m_tempAngularVelocity3;
 	
+	const float										m_mu = 0.05;
+
 	bool											m_realTimeRender;
 	bool											m_isFirstTimeStep;
+	bool											m_frictionEnabled;
 
 	float dt;
 	float vis;

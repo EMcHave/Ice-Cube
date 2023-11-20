@@ -8,8 +8,8 @@ class Cube : public GeometricObject
 {
 public:
 	Cube();
-	Cube(DirectX::XMFLOAT3 pos, XMFLOAT4 color, float, float, bool);
-	Cube(DirectX::XMFLOAT3 pos, DirectX::XMVECTOR quat, XMFLOAT4 color, float, float, bool);
+	Cube(DirectX::XMFLOAT3 pos, XMFLOAT4 color, float, float);
+	Cube(DirectX::XMFLOAT3 pos, DirectX::XMVECTOR quat, XMFLOAT4 color, float, float);
 
 	void SetInitialQuaternion(XMVECTOR);
 
@@ -30,6 +30,9 @@ public:
 	void Force(DirectX::XMVECTOR f) { m_force = f; }
 	DirectX::XMVECTOR& Force() { return m_force; }
 
+	void FricForce(DirectX::XMVECTOR f) { m_frictionalForce = f; }
+	DirectX::XMVECTOR& FricForce() { return m_frictionalForce; }
+
 	void Moment(DirectX::XMVECTOR m) { m_moment = m; }
 	DirectX::XMVECTOR& Moment() { return m_moment; }
 
@@ -39,6 +42,7 @@ public:
 	void ResetForcesAndMoments()
 	{
 		m_force = XMVectorZero();
+		m_frictionalForce = XMVectorZero();
 		m_moment = XMVectorZero();
 	}
 	
@@ -57,6 +61,7 @@ private:
 
 	
 	DirectX::XMVECTOR								m_force;
+	DirectX::XMVECTOR								m_frictionalForce;
 	DirectX::XMVECTOR								m_moment;
 	uint32_t										m_numberOfConnections;
 	std::vector<Connection*>						m_connections;
